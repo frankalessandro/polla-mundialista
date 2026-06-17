@@ -1,0 +1,54 @@
+---
+import Layout from '../layouts/Layout.astro';
+import StandingsTable from '../components/StandingsTable.astro';
+import LiveBadge from '../components/LiveBadge.astro';
+import { getMatches } from '../lib/matchSource.ts';
+import { getLeagueBadge } from '../lib/sportsdb.ts';
+import { buildStandings } from '../lib/scoring.ts';
+import { participants } from '../data/participants.ts';
+
+const matches = await getMatches();
+const leagueBadge = await getLeagueBadge();
+const standings = buildStandings(matches, participants);
+const playedCount = matches.filter((m) => m.result !== null).length;
+const liveMatches = matches.filter((m) => m.live);
+---
+
+<Layout title="Clasificación general">
+  <section class="hero reveal flex items-center gap-5 border border-border rounded-2xl p-[1.5rem_1.75rem] mb-6 [background:var(--grad-soft)] [box-shadow:var(--shadow-sm)] max-[540px]:flex-col max-[540px]:text-center">
+    <img src={leagueBadge} alt="FIFA World Cup" class="h-[92px] w-auto [filter:drop-shadow(0_8px_16px_rgba(110,80,190,.28))] [animation:float_4s_ease-in-out_infinite]" />
+    <div>
+      <p class="m-0 font-bold text-[.78rem] tracking-[.14em] uppercase text-primary">Copa del Mundo 2026</p>
+      <h1>Clasificación</h1>
+      <p class="text-muted mt-1.5 mb-0 font-medium">
+        {participants.length} participantes · {playedCount} de {matches.length} partidos jugados
+      </p>
+    </div>
+  </section>
+
+  {liveMatches.length > 0 && (
+    <div class="reveal bg-surface border border-[rgba(255,93,122,.3)] rounded-2xl p-[.9rem_1.1rem] mb-6 [box-shadow:var(--shadow-sm)]">
+      <div class="flex items-center gap-2.5 flex-wrap text-text">
+        <LiveBadge label="En vivo" />
+        <strong>Clasificación provisional</strong> — los puntos pueden cambiar
+      </div>
+      <div class="flex flex-wrap gap-2 mt-3">
+        {liveMatches.map((m) => (
+          <a href={`/partido/${m.id}`} class="bg-surface-2 border border-border rounded-full px-3 py-1 text-[.85rem] text-text transition-[transform,box-shadow] duration-[.18s] hover:-translate-y-0.5 hover:[box-shadow:var(--shadow-sm)]">
+            {m.home} <b class="text-live">{m.result!.home}-{m.result!.away}</b> {m.away}
+          </a>
+        ))}
+      </div>
+    </div>
+  )}
+
+  {playedCount === 0 && (
+    <p class="reveal bg-surface border border-border border-l-4 border-l-primary-2 rounded-xl p-[.85rem_1.1rem] text-muted mb-6">
+      Aún no hay resultados cargados: todos los puntajes están en cero hasta que se jueguen los partidos.
+    </p>
+  )}
+
+  <div class="card reveal" style="animation-delay:.08s">
+    <StandingsTable rows={standings} />
+  </div>
+</Layout>
