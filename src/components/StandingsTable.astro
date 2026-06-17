@@ -15,21 +15,44 @@ const rankClass = (i: number) => {
 ---
 
 <div class="table-scroll">
-  <table>
+  <table id="standings-table">
     <thead>
       <tr>
         <th class="num">#</th>
         <th>Participante</th>
-        <th class="num">Pts</th>
-        <th class="num hide-sm" title="Marcadores exactos (5 pts)">Exactos</th>
-        <th class="num" title="Resultados acertados (2 o 3 pts)">Aciertos</th>
+        <th class="num" data-col="pts" data-sort="desc" title="Puntos totales">
+          Pts
+          <svg class="sort-icon" viewBox="0 0 8 12" width="8" height="12" aria-hidden="true">
+            <path class="up" d="M4 0L0 5h8z" /><path class="down" d="M4 12L0 7h8z" />
+          </svg>
+        </th>
+        <th class="num hide-sm" data-col="exactos" title="Marcadores exactos (5 pts)">
+          Exactos
+          <svg class="sort-icon" viewBox="0 0 8 12" width="8" height="12" aria-hidden="true">
+            <path class="up" d="M4 0L0 5h8z" /><path class="down" d="M4 12L0 7h8z" />
+          </svg>
+        </th>
+        <th class="num" data-col="aciertos" title="Resultados acertados (2 o 3 pts)">
+          Aciertos
+          <svg class="sort-icon" viewBox="0 0 8 12" width="8" height="12" aria-hidden="true">
+            <path class="up" d="M4 0L0 5h8z" /><path class="down" d="M4 12L0 7h8z" />
+          </svg>
+        </th>
         <th class="num hide-sm">Jugados</th>
       </tr>
     </thead>
     <tbody>
       {
         rows.map((row, i) => (
-          <tr style={`animation-delay:${Math.min(i * 0.025, 0.5)}s`} class="reveal">
+          <tr
+            style={`animation-delay:${Math.min(i * 0.025, 0.5)}s`}
+            class="reveal"
+            data-name={row.name.toLowerCase()}
+            data-pts={row.total}
+            data-exactos={row.exactScores}
+            data-aciertos={row.correctOutcomes}
+            data-jugados={row.played}
+          >
             <td class="num">
               <span class={`inline-flex items-center justify-center min-w-[1.6rem] h-[1.6rem] px-1.5 rounded-full font-bold text-[.85rem] ${rankClass(i)}`}>
                 {i + 1}
@@ -50,3 +73,84 @@ const rankClass = (i: number) => {
     </tbody>
   </table>
 </div>
+
+<script>
+  const table = document.getElementById('standings-table') as HTMLTableElement;
+  const tbody = table.querySelector('tbody')!;
+  let activeCol = 'pts';
+  let activeDir: 'asc' | 'desc' = 'desc';
+
+  function sortBy(col: string, dir: 'asc' | 'desc') {
+    activeCol = col;
+    activeDir = dir;
+
+    table.querySelectorAll<HTMLElement>('th[data-col]').forEach((th) => th.removeAttribute('data-sort'));
+    table.querySelector<HTMLElement>(`th[data-col="${col}"]`)?.setAttribute('data-sort', dir);
+
+    tbody.style.opacity = '0';
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const dataRows = Array.from(tbody.querySelectorAll<HTMLTableRowElement>('tr[data-name]'));
+        dataRows.sort((a, b) => {
+          const av = col === 'name' ? a.dataset.name! : Number(a.dataset[col]);
+          const bv = col === 'name' ? b.dataset.name! : Number(b.dataset[col]);
+          if (av < bv) return dir === 'asc' ? -1 : 1;
+          if (av > bv) return dir === 'asc' ? 1 : -1;
+          return 0;
+        });
+        dataRows.forEach((r) => tbody.appendChild(r));
+        tbody.style.opacity = '1';
+      });
+    });
+  }
+
+  table.querySelector('thead')!.addEventListener('click', (e) => {
+    const th = (e.target as Element).closest<HTMLElement>('th[data-col]');
+    if (!th) return;
+    const col = th.dataset.col!;
+    const dir = activeCol === col && activeDir === 'desc' ? 'asc' : 'desc';
+    sortBy(col, dir);
+  });
+</script>
+
+<style>
+  th[data-col] {
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+    transition: color 0.15s, background 0.15s;
+  }
+
+  th[data-col]:hover {
+    color: var(--text);
+    background: var(--border);
+  }
+
+  .sort-icon {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 3px;
+    position: relative;
+    top: -1px;
+  }
+
+  .sort-icon .up,
+  .sort-icon .down {
+    fill: currentColor;
+    opacity: 0.25;
+    transition: opacity 0.15s;
+  }
+
+  tbody { transition: opacity 0.15s ease; }
+
+  th[data-sort] .sort-icon { color: var(--primary); }
+
+  th[data-sort="asc"] .sort-icon .up    { opacity: 1; }
+  th[data-sort="asc"] .sort-icon .down  { opacity: 0.2; }
+  th[data-sort="desc"] .sort-icon .up   { opacity: 0.2; }
+  th[data-sort="desc"] .sort-icon .down { opacity: 1; }
+
+  @media (max-width: 600px) {
+    .hide-sm { display: none; }
+  }
+</style>
