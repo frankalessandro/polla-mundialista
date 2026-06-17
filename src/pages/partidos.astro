@@ -1,0 +1,113 @@
+---
+import Layout from '../layouts/Layout.astro';
+import MatchCard from '../components/MatchCard.astro';
+import { getMatches } from '../lib/matchSource.ts';
+import { matchesByGroup, matchesByDate } from '../lib/views.ts';
+
+const matches = await getMatches();
+const byGroup = [...matchesByGroup(matches).entries()];
+const byDate = matchesByDate(matches);
+
+const dateFmt = new Intl.DateTimeFormat('es', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+});
+const formatDate = (iso: string) => dateFmt.format(new Date(`${iso}T00:00:00`));
+---
+
+<Layout title="Partidos">
+	<h1>Partidos</h1>
+	<p class="subtitle">Fase de grupos · {matches.length} partidos</p>
+
+	<div class="tabs" role="tablist">
+		<button type="button" class="tab is-active" data-view="grupo">Por grupo</button>
+		<button type="button" class="tab" data-view="fecha">Por fecha</button>
+	</div>
+
+	<section data-panel="grupo">
+		{
+			byGroup.map(([group, ms]) => (
+				<div class="bucket">
+					<h2>Grupo {group}</h2>
+					<div class="cards">
+						{ms.map((m) => (
+							<MatchCard match={m} />
+						))}
+					</div>
+				</div>
+			))
+		}
+	</section>
+
+	<section data-panel="fecha" hidden>
+		{
+			byDate.map((bucket) => (
+				<div class="bucket">
+					<h2>{formatDate(bucket.date)}</h2>
+					<div class="cards">
+						{bucket.matches.map((m) => (
+							<MatchCard match={m} />
+						))}
+					</div>
+				</div>
+			))
+		}
+	</section>
+</Layout>
+
+<script>
+	const tabs = document.querySelectorAll<HTMLButtonElement>('.tab');
+	const panels = document.querySelectorAll<HTMLElement>('[data-panel]');
+	tabs.forEach((tab) => {
+		tab.addEventListener('click', () => {
+			const view = tab.dataset.view;
+			tabs.forEach((t) => t.classList.toggle('is-active', t === tab));
+			panels.forEach((p) => {
+				p.hidden = p.dataset.panel !== view;
+			});
+		});
+	});
+</script>
+
+<style>
+	.tabs {
+		display: flex;
+		gap: 0.5rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.tab {
+		background: var(--surface);
+		color: var(--muted);
+		border: 1px solid var(--border);
+		border-radius: 999px;
+		padding: 0.4rem 1rem;
+		font: inherit;
+		font-weight: 600;
+		cursor: pointer;
+	}
+
+	.tab.is-active {
+		background: var(--accent-soft);
+		color: var(--text);
+		border-color: var(--accent);
+	}
+
+	.bucket {
+		margin-bottom: 2rem;
+	}
+
+	.bucket h2 {
+		font-size: 1.05rem;
+		margin: 0 0 0.75rem;
+		color: var(--muted);
+		text-transform: capitalize;
+	}
+
+	.cards {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+		gap: 0.75rem;
+	}
+</style>

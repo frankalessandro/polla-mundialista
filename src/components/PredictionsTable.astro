@@ -1,0 +1,38 @@
+---
+import type { MatchPredictionRow } from '../lib/views.ts';
+
+interface Props {
+  rows: MatchPredictionRow[];
+  /** Si el partido ya se jugó (entonces se muestra la columna de puntos). */
+  played: boolean;
+}
+
+const { rows, played } = Astro.props;
+---
+
+<table>
+	<thead>
+		<tr>
+			<th>Participante</th>
+			<th class="num">Apuesta</th>
+			{played && <th class="num">Puntos</th>}
+		</tr>
+	</thead>
+	<tbody>
+		{
+			rows.map((row) => (
+				<tr>
+					<td>
+						<a href={`/participante/${row.participantId}`}>{row.name}</a>
+					</td>
+					<td class="num">{row.home} - {row.away}</td>
+					{played && (
+						<td class="num">
+							<strong>{row.points}</strong>
+						</td>
+					)}
+				</tr>
+			))
+		}
+	</tbody>
+</table>
