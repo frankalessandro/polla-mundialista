@@ -1,47 +1,69 @@
-# Astro Starter Kit: Basics
+# Polla Mundialista 2026
 
-```sh
-pnpm create astro@latest -- --template basics
+![Pantalla principal](src/assets/img_readme.png)
+
+Web app de quiniela para la fase de grupos del Mundial 2026. Muestra la tabla de posiciones en tiempo real, el detalle de predicciones por participante y el resumen de cada partido.
+
+## Stack
+
+- [Astro 6](https://astro.build/) — generación estática con TypeScript estricto
+- `pnpm` como gestor de paquetes
+- Node >= 22.12.0 (los tests corren sobre TypeScript nativo vía `node:test`)
+
+## Comandos
+
+```bash
+pnpm install    # instalar dependencias
+pnpm dev        # servidor de desarrollo en localhost:4321
+pnpm build      # build de producción → dist/
+pnpm preview    # sirve el dist/ construido
+pnpm test       # ejecuta todos los *.test.ts
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Correr un solo archivo de test o filtrar por nombre:
 
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
+```bash
+node --test src/lib/scoring.test.ts
+node --test --test-name-pattern="marcador exacto" "src/**/*.test.ts"
 ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+## Estructura
 
-## 🧞 Commands
+```
+src/
+  pages/
+    index.astro              # home / tabla de posiciones
+    clasificacion.astro      # clasificación general
+    participante/[id].astro  # detalle de un participante
+    partido/[id].astro       # detalle de un partido
+  layouts/                   # shells HTML con <slot />
+  components/                # componentes .astro reutilizables
+  data/
+    matches.ts               # 72 partidos de fase de grupos (2026)
+    participants.ts           # participantes con sus 72 predicciones
+    teamFlags.ts             # mapeo equipo → bandera
+    Prueba.xlsx              # fuente original de predicciones (no editar)
+  lib/
+    scoring.ts               # lógica de puntaje (pura, testeable)
+    scoring.test.ts
+    views.ts                 # helpers de presentación sin Astro
+    views.test.ts
+    matchSource.ts           # integración con fuente de resultados en vivo
+    sportsdb.ts              # cliente TheSportsDB
+```
 
-All commands are run from the root of the project, from a terminal:
+## Sistema de puntos
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `pnpm install`             | Installs dependencies                            |
-| `pnpm dev`             | Starts local dev server at `localhost:4321`      |
-| `pnpm build`           | Build your production site to `./dist/`          |
-| `pnpm preview`         | Preview your build locally, before deploying     |
-| `pnpm astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `pnpm astro -- --help` | Get help using the Astro CLI                     |
+| Situación | Puntos |
+|---|---|
+| Marcador exacto (ambos goles) | 5 |
+| Resultado correcto (ganador o empate) | +2 |
+| Goles de al menos un equipo acertados | +1 |
 
-## 👀 Want to learn more?
+Los bonos de resultado y goles son independientes — cuando no hay exacto se pueden sumar 0 / 1 / 2 / 3 puntos. Solo se puntúan partidos con resultado registrado (`result !== null`).
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
-# polla-mundialista
+## Datos
+
+- `matches.ts` — fuente de verdad de partidos y resultados; `result: null` = partido no jugado.
+- `participants.ts` — generado desde `Prueba.xlsx` (hoja "Polla - Grupos"); no editar a mano.
+- Los resultados en vivo se obtienen vía TheSportsDB (`src/lib/sportsdb.ts`).
