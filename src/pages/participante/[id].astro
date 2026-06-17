@@ -1,0 +1,73 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getMatches } from '../../lib/matchSource.ts';
+import { breakdownForParticipant } from '../../lib/views.ts';
+import { buildStandings } from '../../lib/scoring.ts';
+import { participants } from '../../data/participants.ts';
+
+export function getStaticPaths() {
+  return participants.map((p) => ({ params: { id: String(p.id) } }));
+}
+
+const id = Number(Astro.params.id);
+const participant = participants.find((p) => p.id === id)!;
+
+const matches = await getMatches();
+const breakdown = breakdownForParticipant(id, matches, participants);
+const standings = buildStandings(matches, participants);
+const position = standings.findIndex((r) => r.participantId === id) + 1;
+const row = standings.find((r) => r.participantId === id)!;
+---
+
+<Layout title={participant.name}>
+	<p class="subtitle"><a href="/">← Clasificación</a></p>
+	<h1>{participant.name}</h1>
+	<p class="subtitle">
+		Puesto #{position} · {row.total} puntos · {row.played} partidos jugados
+	</p>
+
+	{
+		breakdown.length === 0 ? (
+			<p class="empty">
+				Todavía no hay partidos jugados, así que aún no se han ganado puntos.
+			</p>
+		) : (
+			<table>
+				<thead>
+					<tr>
+						<th>Partido</th>
+						<th class="num">Apuesta</th>
+						<th class="num">Resultado</th>
+						<th class="num">Puntos</th>
+					</tr>
+				</thead>
+				<tbody>
+					{breakdown.map((b) => (
+						<tr>
+							<td>
+								<a href={`/partido/${b.match.id}`}>
+									{b.match.home} vs {b.match.away}
+								</a>
+								<span class="muted"> · Grupo {b.match.group} · {b.match.date}</span>
+							</td>
+							<td class="num">{b.prediction.home} - {b.prediction.away}</td>
+							<td class="num">{b.result.home} - {b.result.away}</td>
+							<td class="num"><strong>{b.points}</strong></td>
+						</tr>
+					))}
+				</tbody>
+			</table>
+		)
+	}
+</Layout>
+
+<style>
+	.muted {
+		color: var(--muted);
+		font-size: 0.85rem;
+	}
+
+	.empty {
+		color: var(--muted);
+	}
+</style>

@@ -1,0 +1,75 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PredictionsTable from '../../components/PredictionsTable.astro';
+import { getMatches } from '../../lib/matchSource.ts';
+import { predictionsForMatch } from '../../lib/views.ts';
+import { participants } from '../../data/participants.ts';
+
+export async function getStaticPaths() {
+  const matches = await getMatches();
+  return matches.map((m) => ({ params: { id: String(m.id) }, props: { match: m } }));
+}
+
+const { match } = Astro.props;
+const played = match.result !== null;
+const rows = predictionsForMatch(match, participants);
+---
+
+<Layout title={`${match.home} vs ${match.away}`}>
+	<p class="subtitle"><a href="/partidos">← Partidos</a></p>
+
+	<div class="header">
+		<div class="teams">
+			<span class="team">{match.home}</span>
+			<span class={`score ${played ? 'played' : ''}`}>
+				{played ? `${match.result!.home} - ${match.result!.away}` : 'vs'}
+			</span>
+			<span class="team">{match.away}</span>
+		</div>
+		<p class="subtitle meta">
+			Grupo {match.group} · {match.date} · {match.time} · {match.stadium}
+			{!played && ' · No jugado'}
+		</p>
+	</div>
+
+	<h2>Apuestas ({rows.length})</h2>
+	<PredictionsTable rows={rows} played={played} />
+</Layout>
+
+<style>
+	.header {
+		background: var(--surface);
+		border: 1px solid var(--border);
+		border-radius: 12px;
+		padding: 1.25rem;
+		margin-bottom: 1.5rem;
+		text-align: center;
+	}
+
+	.teams {
+		display: grid;
+		grid-template-columns: 1fr auto 1fr;
+		align-items: center;
+		gap: 1rem;
+		font-size: 1.3rem;
+		font-weight: 700;
+	}
+
+	.score {
+		color: var(--muted);
+		font-variant-numeric: tabular-nums;
+	}
+
+	.score.played {
+		color: var(--accent);
+	}
+
+	.meta {
+		margin: 0.75rem 0 0;
+	}
+
+	h2 {
+		font-size: 1.1rem;
+		margin: 0 0 0.75rem;
+	}
+</style>

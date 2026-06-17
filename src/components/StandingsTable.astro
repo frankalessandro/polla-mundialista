@@ -1,0 +1,38 @@
+---
+import type { StandingRow } from '../lib/scoring.ts';
+
+interface Props {
+  rows: StandingRow[];
+}
+
+const { rows } = Astro.props;
+---
+
+<table>
+	<thead>
+		<tr>
+			<th class="num">#</th>
+			<th>Participante</th>
+			<th class="num">Puntos</th>
+			<th class="num" title="Marcadores exactos (5 pts)">Exactos</th>
+			<th class="num" title="Resultados acertados (2 o 3 pts)">Aciertos</th>
+			<th class="num">Jugados</th>
+		</tr>
+	</thead>
+	<tbody>
+		{
+			rows.map((row, i) => (
+				<tr>
+					<td class="num">{i + 1}</td>
+					<td>
+						<a href={`/participante/${row.participantId}`}>{row.name}</a>
+					</td>
+					<td class="num"><strong>{row.total}</strong></td>
+					<td class="num">{row.exactScores}</td>
+					<td class="num">{row.correctOutcomes}</td>
+					<td class="num">{row.played}</td>
+				</tr>
+			))
+		}
+	</tbody>
+</table>

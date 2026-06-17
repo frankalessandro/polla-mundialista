@@ -1,11 +1,39 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
+import StandingsTable from '../components/StandingsTable.astro';
+import { getMatches } from '../lib/matchSource.ts';
+import { buildStandings } from '../lib/scoring.ts';
+import { participants } from '../data/participants.ts';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const matches = await getMatches();
+const standings = buildStandings(matches, participants);
+const playedCount = matches.filter((m) => m.result !== null).length;
 ---
 
-<Layout>
-	<Welcome />
+<Layout title="Clasificación general">
+	<h1>Clasificación general</h1>
+	<p class="subtitle">
+		{participants.length} participantes · {playedCount} de {matches.length} partidos jugados
+	</p>
+	{
+		playedCount === 0 && (
+			<p class="notice">
+				Aún no hay resultados cargados: todos los puntajes están en cero hasta que
+				se jueguen los partidos.
+			</p>
+		)
+	}
+	<StandingsTable rows={standings} />
 </Layout>
+
+<style>
+	.notice {
+		background: var(--surface);
+		border: 1px solid var(--border);
+		border-left: 3px solid var(--accent);
+		border-radius: 8px;
+		padding: 0.75rem 1rem;
+		color: var(--muted);
+		margin-bottom: 1.25rem;
+	}
+</style>

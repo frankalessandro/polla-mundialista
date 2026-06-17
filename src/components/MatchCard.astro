@@ -1,0 +1,93 @@
+---
+import type { Match } from '../data/matches.ts';
+
+interface Props {
+  match: Match;
+}
+
+const { match } = Astro.props;
+const played = match.result !== null;
+const score = played ? `${match.result!.home} - ${match.result!.away}` : 'vs';
+---
+
+<a href={`/partido/${match.id}`} class="match-card">
+	<div class="teams">
+		<span class="team home">{match.home}</span>
+		<span class={`score ${played ? 'played' : ''}`}>{score}</span>
+		<span class="team away">{match.away}</span>
+	</div>
+	<div class="meta">
+		<span>Grupo {match.group}</span>
+		<span>{match.date} · {match.time}</span>
+		<span class="stadium">{match.stadium}</span>
+	</div>
+	{!played && <span class="badge">No jugado</span>}
+</a>
+
+<style>
+	.match-card {
+		display: block;
+		background: var(--surface);
+		border: 1px solid var(--border);
+		border-radius: 10px;
+		padding: 0.8rem 1rem;
+		color: var(--text);
+		position: relative;
+	}
+
+	.match-card:hover {
+		border-color: var(--accent);
+		text-decoration: none;
+	}
+
+	.teams {
+		display: grid;
+		grid-template-columns: 1fr auto 1fr;
+		align-items: center;
+		gap: 0.75rem;
+		font-weight: 600;
+	}
+
+	.team.home {
+		text-align: right;
+	}
+
+	.team.away {
+		text-align: left;
+	}
+
+	.score {
+		color: var(--muted);
+		font-variant-numeric: tabular-nums;
+		min-width: 3rem;
+		text-align: center;
+	}
+
+	.score.played {
+		color: var(--accent);
+		font-weight: 700;
+	}
+
+	.meta {
+		display: flex;
+		justify-content: center;
+		flex-wrap: wrap;
+		gap: 0.35rem 0.9rem;
+		margin-top: 0.45rem;
+		color: var(--muted);
+		font-size: 0.8rem;
+	}
+
+	.badge {
+		position: absolute;
+		top: 0.6rem;
+		right: 0.7rem;
+		font-size: 0.65rem;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		color: var(--muted);
+		border: 1px solid var(--border);
+		border-radius: 999px;
+		padding: 0.1rem 0.5rem;
+	}
+</style>
