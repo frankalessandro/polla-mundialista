@@ -1,0 +1,32 @@
+---
+interface Props {
+  size?: string;
+}
+const { size = '2.5rem' } = Astro.props;
+---
+
+<div class="loader" aria-label="Cargando…" role="status">
+  <img src="/Ball.png" alt="" class="ball" style={`width:${size};height:${size}`} />
+</div>
+
+<style>
+  .loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+  }
+
+  .ball {
+    animation: roll 0.8s linear infinite;
+    transform-origin: center;
+  }
+
+  @keyframes roll {
+    from { transform: rotate(0deg) translateX(0); }
+    25%  { transform: rotate(90deg) translateX(6px); }
+    50%  { transform: rotate(180deg) translateX(0); }
+    75%  { transform: rotate(270deg) translateX(-6px); }
+    to   { transform: rotate(360deg) translateX(0); }
+  }
+</style>
