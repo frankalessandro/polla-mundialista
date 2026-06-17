@@ -13,9 +13,14 @@
     "test": "node --test \"src/**/*.test.ts\""
   },
   "dependencies": {
-    "astro": "^6.4.6"
+    "@tailwindcss/vite": "^4.3.1",
+    "astro": "^6.4.6",
+    "tailwindcss": "^4.3.1"
   },
   "pnpm": {
-    "onlyBuiltDependencies": ["esbuild", "sharp"]
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp"
+    ]
   }
 }

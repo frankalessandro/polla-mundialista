@@ -17,186 +17,93 @@ const formatDate = (iso: string) => dateFmt.format(new Date(`${iso}T00:00:00`));
 ---
 
 <Layout title="Partidos">
-	<header class="page-head reveal">
-		<p class="kicker">Copa del Mundo 2026</p>
-		<h1>Partidos</h1>
-		<p class="subtitle">Fase de grupos · {matches.length} partidos</p>
-	</header>
+  <header class="page-head reveal mb-5">
+    <p class="m-0 font-bold text-[.78rem] tracking-[.14em] uppercase text-primary">Copa del Mundo 2026</p>
+    <h1>Partidos</h1>
+    <p class="text-muted mt-1.5 mb-0 font-medium">Fase de grupos · {matches.length} partidos</p>
+  </header>
 
-	<div class="tabs reveal" role="tablist">
-		<button type="button" class="tab is-active" data-view="grupo">Por grupo</button>
-		<button type="button" class="tab" data-view="fecha">Por fecha</button>
-	</div>
+  <div class="reveal inline-flex gap-1.5 mb-7 bg-surface border border-border rounded-full p-[.3rem] [box-shadow:var(--shadow-sm)]" role="tablist">
+    <button type="button" class="tab is-active" data-view="grupo">Por grupo</button>
+    <button type="button" class="tab" data-view="fecha">Por fecha</button>
+  </div>
 
-	<section data-panel="grupo">
-		{
-			byGroup.map(([group, ms]) => (
-				<div class="bucket">
-					<h2 class="bucket-title">
-						<span class="dot" />Grupo {group}
-					</h2>
-					<div class="cards">
-						{ms.map((m) => (
-							<MatchCard match={m} />
-						))}
-					</div>
-				</div>
-			))
-		}
-	</section>
+  <section data-panel="grupo">
+    {byGroup.map(([group, ms]) => (
+      <div class="mb-9">
+        <h2 class="flex items-center gap-2 text-[1.45rem] mb-3.5 text-text capitalize">
+          <span class="w-2.5 h-2.5 rounded-full [background:var(--grad)]"></span>
+          Grupo {group}
+        </h2>
+        <div class="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-3.5">
+          {ms.map((m) => <MatchCard match={m} />)}
+        </div>
+      </div>
+    ))}
+  </section>
 
-	<section data-panel="fecha" hidden>
-		{
-			byDate.map((bucket) => (
-				<div class="bucket" data-date={bucket.date}>
-					<h2 class="bucket-title">
-						<span class="dot" />
-						{formatDate(bucket.date)}
-					</h2>
-					<div class="cards">
-						{bucket.matches.map((m) => (
-							<MatchCard match={m} />
-						))}
-					</div>
-				</div>
-			))
-		}
-	</section>
+  <section data-panel="fecha" hidden>
+    {byDate.map((bucket) => (
+      <div class="mb-9" data-date={bucket.date}>
+        <h2 class="flex items-center gap-2 text-[1.45rem] mb-3.5 text-text capitalize">
+          <span class="w-2.5 h-2.5 rounded-full [background:var(--grad)]"></span>
+          {formatDate(bucket.date)}
+        </h2>
+        <div class="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-3.5">
+          {bucket.matches.map((m) => <MatchCard match={m} />)}
+        </div>
+      </div>
+    ))}
+  </section>
 </Layout>
 
 <script>
-	const tabs = document.querySelectorAll<HTMLButtonElement>('.tab');
-	const panels = document.querySelectorAll<HTMLElement>('[data-panel]');
+  const tabs = document.querySelectorAll<HTMLButtonElement>('.tab');
+  const panels = document.querySelectorAll<HTMLElement>('[data-panel]');
 
-	function scrollToToday() {
-		const d = new Date();
-		const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-		const panel = document.querySelector<HTMLElement>('[data-panel="fecha"]');
-		if (!panel) return;
+  function scrollToToday() {
+    const d = new Date();
+    const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const panel = document.querySelector<HTMLElement>('[data-panel="fecha"]');
+    if (!panel) return;
 
-		const buckets = Array.from(panel.querySelectorAll<HTMLElement>('[data-date]'));
-		// Primer bucket cuya fecha >= hoy; si todos pasaron, el último
-		const target =
-			buckets.find((b) => (b.dataset.date ?? '') >= today) ?? buckets.at(-1);
+    const buckets = Array.from(panel.querySelectorAll<HTMLElement>('[data-date]'));
+    const target = buckets.find((b) => (b.dataset.date ?? '') >= today) ?? buckets.at(-1);
 
-		if (target) {
-			const headerH = document.querySelector('.site-header')?.getBoundingClientRect().height ?? 0;
-			const top = target.getBoundingClientRect().top + window.scrollY - headerH - 12;
-			window.scrollTo({ top, behavior: 'instant' });
-		}
-	}
+    if (target) {
+      const headerH = document.querySelector('.site-header')?.getBoundingClientRect().height ?? 0;
+      const top = target.getBoundingClientRect().top + window.scrollY - headerH - 12;
+      window.scrollTo({ top, behavior: 'instant' });
+    }
+  }
 
-	tabs.forEach((tab) => {
-		tab.addEventListener('click', () => {
-			const view = tab.dataset.view;
-			tabs.forEach((t) => t.classList.toggle('is-active', t === tab));
-			panels.forEach((p) => {
-				p.hidden = p.dataset.panel !== view;
-			});
-			if (view === 'fecha') {
-				requestAnimationFrame(scrollToToday);
-			}
-		});
-	});
+  tabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const view = tab.dataset.view;
+      tabs.forEach((t) => t.classList.toggle('is-active', t === tab));
+      panels.forEach((p) => { p.hidden = p.dataset.panel !== view; });
+      if (view === 'fecha') requestAnimationFrame(scrollToToday);
+    });
+  });
 </script>
 
 <style>
-	.page-head {
-		margin-bottom: 1.25rem;
-	}
-
-	.kicker {
-		margin: 0;
-		font-weight: 700;
-		font-size: 0.78rem;
-		letter-spacing: 0.14em;
-		text-transform: uppercase;
-		color: var(--primary);
-	}
-
-	.page-head .subtitle {
-		margin: 0.35rem 0 0;
-	}
-
-	.tabs {
-		display: inline-flex;
-		gap: 0.3rem;
-		margin-bottom: 1.75rem;
-		background: var(--surface);
-		border: 1px solid var(--border);
-		border-radius: 999px;
-		padding: 0.3rem;
-		box-shadow: var(--shadow-sm);
-	}
-
-	.tab {
-		background: transparent;
-		color: var(--muted);
-		border: none;
-		border-radius: 999px;
-		padding: 0.5rem 1.15rem;
-		font: inherit;
-		font-weight: 600;
-		cursor: pointer;
-		transition:
-			color 0.2s ease,
-			background 0.2s ease;
-	}
-
-	.tab:hover {
-		color: var(--text);
-	}
-
-	.tab.is-active {
-		color: #fff;
-		background: var(--grad);
-		box-shadow: var(--shadow-sm);
-	}
-
-	.bucket {
-		margin-bottom: 2.25rem;
-	}
-
-	.bucket-title {
-		display: flex;
-		align-items: center;
-		gap: 0.55rem;
-		font-size: 1.45rem;
-		margin: 0 0 0.9rem;
-		color: var(--text);
-		text-transform: capitalize;
-	}
-
-	.bucket-title .dot {
-		width: 0.7rem;
-		height: 0.7rem;
-		border-radius: 50%;
-		background: var(--grad);
-	}
-
-	.cards {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-		gap: 0.85rem;
-	}
-
-	/* Aparición suave y escalonada de las tarjetas. */
-	.cards :global(.match-card) {
-		animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
-	}
-	.cards :global(.match-card:nth-child(2)) {
-		animation-delay: 0.05s;
-	}
-	.cards :global(.match-card:nth-child(3)) {
-		animation-delay: 0.1s;
-	}
-	.cards :global(.match-card:nth-child(4)) {
-		animation-delay: 0.15s;
-	}
-	.cards :global(.match-card:nth-child(5)) {
-		animation-delay: 0.2s;
-	}
-	.cards :global(.match-card:nth-child(6)) {
-		animation-delay: 0.25s;
-	}
+  .tab {
+    background: transparent;
+    color: #8480a3;
+    border: none;
+    border-radius: 999px;
+    padding: .5rem 1.15rem;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color .2s ease, background .2s ease;
+  }
+  .tab:hover { color: #2a2747; }
+  .tab.is-active {
+    color: #fff;
+    background: var(--grad);
+    box-shadow: var(--shadow-sm);
+  }
+  .site-header { /* referenced in JS */ }
 </style>

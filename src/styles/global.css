@@ -1,0 +1,131 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #f4f1fb;
+  --color-surface: #ffffff;
+  --color-surface-2: #f3effb;
+  --color-border: #ece6f8;
+  --color-text: #2a2747;
+  --color-muted: #8480a3;
+  --color-primary: #7c5cff;
+  --color-primary-2: #b08bff;
+  --color-pink: #ff9ed2;
+  --color-mint: #4fd6a6;
+  --color-gold: #f7b955;
+  --color-live: #ff5d7a;
+}
+
+:root {
+  --grad: linear-gradient(120deg, #8b5cf6 0%, #c084fc 45%, #ff9ed2 100%);
+  --grad-soft: linear-gradient(120deg, #efe9ff 0%, #fbeefb 100%);
+  --shadow-sm: 0 4px 14px rgba(110, 80, 190, 0.1);
+  --shadow: 0 12px 32px rgba(110, 80, 190, 0.16);
+}
+
+/* ── Base ─────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; width: 100%; min-height: 100%; }
+
+@layer base {
+  body {
+    position: relative;
+    background: #f4f1fb;
+    color: #2a2747;
+    font-family: 'Outfit', system-ui, sans-serif;
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
+  a { color: #7c5cff; text-decoration: none; }
+  a:hover { text-decoration: none; }
+  h1, h2, h3 {
+    font-family: 'Bebas Neue', 'Outfit', sans-serif;
+    letter-spacing: 0.02em;
+    line-height: 1;
+    color: #2a2747;
+  }
+  h1 { font-size: clamp(2.4rem, 6vw, 3.6rem); margin: 0 0 0.2rem; }
+}
+
+/* ── Animaciones ──────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+@keyframes roll {
+  from { transform: rotate(0deg) translateX(0); }
+  25%  { transform: rotate(90deg) translateX(8px); }
+  50%  { transform: rotate(180deg) translateX(0); }
+  75%  { transform: rotate(270deg) translateX(-8px); }
+  to   { transform: rotate(360deg) translateX(0); }
+}
+@keyframes live-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(255, 93, 122, 0.55); }
+  70%  { box-shadow: 0 0 0 0.5rem rgba(255, 93, 122, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 93, 122, 0); }
+}
+
+.reveal { animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+/* ── Nav loader ───────────────────────────────────────── */
+#nav-loader {
+  position: fixed; inset: 0; z-index: 999;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(244, 241, 251, 0.88);
+  backdrop-filter: blur(8px);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+#nav-loader.is-visible { opacity: 1; pointer-events: all; }
+.nav-ball { width: 3.5rem; height: 3.5rem; animation: roll 0.75s linear infinite; }
+
+/* ── Tabla base ───────────────────────────────────────── */
+table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+th, td { padding: 0.7rem 0.8rem; text-align: left; border-bottom: 1px solid #ece6f8; }
+tbody tr:last-child td { border-bottom: none; }
+thead th {
+  color: #8480a3; font-size: 0.72rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.06em; background: #f3effb;
+}
+tbody tr { transition: background 0.18s ease; }
+tbody tr:hover { background: #f3effb; }
+.num { text-align: center; font-variant-numeric: tabular-nums; }
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* ── Card ─────────────────────────────────────────────── */
+.card {
+  background: #fff;
+  border: 1px solid #ece6f8;
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+/* ── Puntos badge (compartido entre tablas) ───────────── */
+.pts {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 1.7rem; padding: 0.1rem 0.45rem;
+  border-radius: 999px; font-weight: 700; font-size: 0.85rem;
+}
+.p-top { background: linear-gradient(135deg, #c9f7e5, #a7f3d0); color: #0f7a57; }
+.p-mid { background: #e7e0ff; color: #5b3fc4; }
+.p-low { background: #f3effb; color: #8480a3; }
+.p-zero { color: #8480a3; }
+
+/* ── Bet (puntuación en Bebas) ────────────────────────── */
+.bet { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 0.03em; color: #8480a3; }
+.bet.strong { color: #2a2747; }
+
+/* ── Responsive ───────────────────────────────────────── */
+@media (max-width: 600px) { .hide-sm { display: none; } }
+@media (max-width: 400px) { .hide-xs { display: none; } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

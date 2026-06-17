@@ -15,150 +15,40 @@ const liveMatches = matches.filter((m) => m.live);
 ---
 
 <Layout title="Clasificación general">
-	<section class="hero reveal">
-		<img src={leagueBadge} alt="FIFA World Cup" class="hero-logo" />
-		<div class="hero-text">
-			<p class="kicker">Copa del Mundo 2026</p>
-			<h1>Clasificación</h1>
-			<p class="subtitle">
-				{participants.length} participantes · {playedCount} de {matches.length} partidos jugados
-			</p>
-		</div>
-	</section>
+  <section class="hero reveal flex items-center gap-5 border border-border rounded-2xl p-[1.5rem_1.75rem] mb-6 [background:var(--grad-soft)] [box-shadow:var(--shadow-sm)] max-[540px]:flex-col max-[540px]:text-center">
+    <img src={leagueBadge} alt="FIFA World Cup" class="h-[92px] w-auto [filter:drop-shadow(0_8px_16px_rgba(110,80,190,.28))] [animation:float_4s_ease-in-out_infinite]" />
+    <div>
+      <p class="m-0 font-bold text-[.78rem] tracking-[.14em] uppercase text-primary">Copa del Mundo 2026</p>
+      <h1>Clasificación</h1>
+      <p class="text-muted mt-1.5 mb-0 font-medium">
+        {participants.length} participantes · {playedCount} de {matches.length} partidos jugados
+      </p>
+    </div>
+  </section>
 
-	{
-		liveMatches.length > 0 && (
-			<div class="live-banner reveal">
-				<div class="live-head">
-					<LiveBadge label="En vivo" />
-					<strong>Clasificación provisional</strong> — los puntos pueden cambiar
-				</div>
-				<div class="live-list">
-					{liveMatches.map((m) => (
-						<a href={`/partido/${m.id}`} class="live-chip">
-							{m.home} <b>{m.result!.home}-{m.result!.away}</b> {m.away}
-						</a>
-					))}
-				</div>
-			</div>
-		)
-	}
-	{
-		playedCount === 0 && (
-			<p class="notice reveal">
-				Aún no hay resultados cargados: todos los puntajes están en cero hasta que se
-				jueguen los partidos.
-			</p>
-		)
-	}
+  {liveMatches.length > 0 && (
+    <div class="reveal bg-surface border border-[rgba(255,93,122,.3)] rounded-2xl p-[.9rem_1.1rem] mb-6 [box-shadow:var(--shadow-sm)]">
+      <div class="flex items-center gap-2.5 flex-wrap text-text">
+        <LiveBadge label="En vivo" />
+        <strong>Clasificación provisional</strong> — los puntos pueden cambiar
+      </div>
+      <div class="flex flex-wrap gap-2 mt-3">
+        {liveMatches.map((m) => (
+          <a href={`/partido/${m.id}`} class="bg-surface-2 border border-border rounded-full px-3 py-1 text-[.85rem] text-text transition-[transform,box-shadow] duration-[.18s] hover:-translate-y-0.5 hover:[box-shadow:var(--shadow-sm)]">
+            {m.home} <b class="text-live">{m.result!.home}-{m.result!.away}</b> {m.away}
+          </a>
+        ))}
+      </div>
+    </div>
+  )}
 
-	<div class="card reveal" style="animation-delay:.08s">
-		<StandingsTable rows={standings} />
-	</div>
+  {playedCount === 0 && (
+    <p class="reveal bg-surface border border-border border-l-4 border-l-primary-2 rounded-xl p-[.85rem_1.1rem] text-muted mb-6">
+      Aún no hay resultados cargados: todos los puntajes están en cero hasta que se jueguen los partidos.
+    </p>
+  )}
+
+  <div class="card reveal" style="animation-delay:.08s">
+    <StandingsTable rows={standings} />
+  </div>
 </Layout>
-
-<style>
-	.hero {
-		display: flex;
-		align-items: center;
-		gap: 1.25rem;
-		background: var(--grad-soft);
-		border: 1px solid var(--border);
-		border-radius: var(--radius);
-		padding: 1.5rem 1.75rem;
-		margin-bottom: 1.5rem;
-		box-shadow: var(--shadow-sm);
-	}
-
-	.hero-logo {
-		height: 92px;
-		width: auto;
-		filter: drop-shadow(0 8px 16px rgba(110, 80, 190, 0.28));
-		animation: float 4s ease-in-out infinite;
-	}
-
-	@keyframes float {
-		0%,
-		100% {
-			transform: translateY(0);
-		}
-		50% {
-			transform: translateY(-8px);
-		}
-	}
-
-	.kicker {
-		margin: 0;
-		font-weight: 700;
-		font-size: 0.78rem;
-		letter-spacing: 0.14em;
-		text-transform: uppercase;
-		color: var(--primary);
-	}
-
-	.hero .subtitle {
-		margin: 0.35rem 0 0;
-	}
-
-	.live-banner {
-		background: var(--surface);
-		border: 1px solid rgba(255, 93, 122, 0.3);
-		border-radius: var(--radius);
-		padding: 0.9rem 1.1rem;
-		margin-bottom: 1.5rem;
-		box-shadow: var(--shadow-sm);
-	}
-
-	.live-head {
-		display: flex;
-		align-items: center;
-		gap: 0.6rem;
-		flex-wrap: wrap;
-		color: var(--text);
-	}
-
-	.live-list {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem;
-		margin-top: 0.7rem;
-	}
-
-	.live-chip {
-		background: var(--surface-2);
-		border: 1px solid var(--border);
-		border-radius: 999px;
-		padding: 0.3rem 0.75rem;
-		font-size: 0.85rem;
-		color: var(--text);
-		transition:
-			transform 0.18s ease,
-			box-shadow 0.18s ease;
-	}
-
-	.live-chip b {
-		color: var(--live);
-	}
-
-	.live-chip:hover {
-		transform: translateY(-2px);
-		box-shadow: var(--shadow-sm);
-	}
-
-	.notice {
-		background: var(--surface);
-		border: 1px solid var(--border);
-		border-left: 4px solid var(--primary-2);
-		border-radius: 12px;
-		padding: 0.85rem 1.1rem;
-		color: var(--muted);
-		margin-bottom: 1.5rem;
-	}
-
-	@media (max-width: 540px) {
-		.hero {
-			flex-direction: column;
-			text-align: center;
-		}
-	}
-</style>

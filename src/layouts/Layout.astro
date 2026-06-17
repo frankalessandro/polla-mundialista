@@ -1,4 +1,5 @@
 ---
+import '../styles/global.css';
 import { getLeagueBadge } from '../lib/sportsdb.ts';
 
 interface Props {
@@ -28,22 +29,44 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
 		<title>{fullTitle}</title>
 	</head>
 	<body>
-		<div class="pitch-lines" aria-hidden="true"></div>
-		<header class="site-header">
-			<a href="/" class="brand">
-				<img src={leagueBadge} alt="FIFA World Cup" class="brand-logo" />
-				<span class="brand-name">Polla<br />Mundialista</span>
+		<!-- Líneas de cancha decorativas -->
+		<div
+			class="fixed inset-0 -z-10 pointer-events-none opacity-50"
+			style="background: radial-gradient(circle at 50% -10%, rgba(176,139,255,.18), transparent 45%), radial-gradient(circle at 100% 100%, rgba(255,158,210,.16), transparent 40%), radial-gradient(circle at 0% 80%, rgba(79,214,166,.12), transparent 40%)"
+			aria-hidden="true"
+		></div>
+
+		<!-- Header -->
+		<header class="sticky top-0 z-10 flex items-center justify-between gap-4 px-5 py-2.5 border-b border-border backdrop-blur-[12px]"
+			style="background: rgba(255,255,255,.82)">
+			<a href="/" class="flex items-center gap-2.5 brand">
+				<img src={leagueBadge} alt="FIFA World Cup" class="h-[42px] w-auto brand-logo"
+					style="filter: drop-shadow(0 3px 6px rgba(110,80,190,.25)); transition: transform .3s ease" />
+				<span class="font-['Bebas_Neue'] text-[1.4rem] leading-[.92] tracking-[.03em] brand-name"
+					style="background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent">
+					Polla<br />Mundialista
+				</span>
 			</a>
-			<nav>
-				<a href="/" class={isActive('/') ? 'active' : ''}>Clasificación</a>
-				<a href="/partidos" class={isActive('/partidos') ? 'active' : ''}>Partidos</a>
+			<nav class="flex gap-1.5">
+				<a href="/"
+					class={`font-semibold text-[.95rem] px-4 py-[.45rem] rounded-full transition-all duration-200 ${isActive('/') ? 'text-white shadow-sm' : 'text-muted hover:text-text hover:bg-surface-2'}`}
+					style={isActive('/') ? 'background: var(--grad)' : ''}>
+					Clasificación
+				</a>
+				<a href="/partidos"
+					class={`font-semibold text-[.95rem] px-4 py-[.45rem] rounded-full transition-all duration-200 ${isActive('/partidos') ? 'text-white shadow-sm' : 'text-muted hover:text-text hover:bg-surface-2'}`}
+					style={isActive('/partidos') ? 'background: var(--grad)' : ''}>
+					Partidos
+				</a>
 			</nav>
 		</header>
-		<main>
+
+		<main class="max-w-[980px] mx-auto px-5 pt-7 pb-12 max-sm:px-3.5 max-sm:pt-4">
 			<slot />
 		</main>
-		<footer class="site-footer">
-			<img src={leagueBadge} alt="" class="foot-logo" />
+
+		<footer class="flex items-center justify-center gap-2.5 px-4 py-8 text-muted text-sm">
+			<img src={leagueBadge} alt="" class="h-[26px] opacity-70" />
 			<span>Polla Mundialista · Copa del Mundo 2026</span>
 		</footer>
 
@@ -64,340 +87,11 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
 		loader.classList.add('is-visible');
 	});
 
-	// Ocultar si el usuario vuelve con el botón atrás (página en caché)
 	window.addEventListener('pageshow', () => loader.classList.remove('is-visible'));
 </script>
 
-<style is:global>
-	:root {
-		--bg: #f4f1fb;
-		--surface: #ffffff;
-		--surface-2: #f3effb;
-		--border: #ece6f8;
-		--text: #2a2747;
-		--muted: #8480a3;
-		--primary: #7c5cff;
-		--primary-2: #b08bff;
-		--pink: #ff9ed2;
-		--mint: #4fd6a6;
-		--gold: #f7b955;
-		--live: #ff5d7a;
-		--grad: linear-gradient(120deg, #8b5cf6 0%, #c084fc 45%, #ff9ed2 100%);
-		--grad-soft: linear-gradient(120deg, #efe9ff 0%, #fbeefb 100%);
-		--shadow-sm: 0 4px 14px rgba(110, 80, 190, 0.1);
-		--shadow: 0 12px 32px rgba(110, 80, 190, 0.16);
-		--radius: 16px;
-	}
-
-	* {
-		box-sizing: border-box;
-	}
-
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		min-height: 100%;
-	}
-
-	body {
-		position: relative;
-		background: var(--bg);
-		color: var(--text);
-		font-family: 'Outfit', system-ui, sans-serif;
-		line-height: 1.5;
-		overflow-x: hidden;
-	}
-
-	/* Líneas de cancha decorativas, muy sutiles, al fondo. */
-	.pitch-lines {
-		position: fixed;
-		inset: 0;
-		z-index: -1;
-		pointer-events: none;
-		opacity: 0.5;
-		background:
-			radial-gradient(circle at 50% -10%, rgba(176, 139, 255, 0.18), transparent 45%),
-			radial-gradient(circle at 100% 100%, rgba(255, 158, 210, 0.16), transparent 40%),
-			radial-gradient(circle at 0% 80%, rgba(79, 214, 166, 0.12), transparent 40%);
-	}
-
-	a {
-		color: var(--primary);
-		text-decoration: none;
-	}
-
-	a:hover {
-		text-decoration: none;
-	}
-
-	h1,
-	h2,
-	h3 {
-		font-family: 'Bebas Neue', 'Outfit', sans-serif;
-		letter-spacing: 0.02em;
-		line-height: 1;
-		color: var(--text);
-	}
-
-	/* ── Header ─────────────────────────────────────────── */
-	.site-header {
-		position: sticky;
-		top: 0;
-		z-index: 10;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 1rem;
-		padding: 0.6rem 1.25rem;
-		background: rgba(255, 255, 255, 0.82);
-		backdrop-filter: blur(12px);
-		border-bottom: 1px solid var(--border);
-	}
-
-	.brand {
-		display: flex;
-		align-items: center;
-		gap: 0.65rem;
-	}
-
-	.brand-logo {
-		height: 42px;
-		width: auto;
-		filter: drop-shadow(0 3px 6px rgba(110, 80, 190, 0.25));
-		transition: transform 0.3s ease;
-	}
-
+<style>
 	.brand:hover .brand-logo {
 		transform: rotate(-6deg) scale(1.06);
-	}
-
-	.brand-name {
-		font-family: 'Bebas Neue', sans-serif;
-		font-size: 1.4rem;
-		line-height: 0.92;
-		letter-spacing: 0.03em;
-		background: var(--grad);
-		-webkit-background-clip: text;
-		background-clip: text;
-		color: transparent;
-	}
-
-	.site-header nav {
-		display: flex;
-		gap: 0.4rem;
-	}
-
-	.site-header nav a {
-		color: var(--muted);
-		font-weight: 600;
-		font-size: 0.95rem;
-		padding: 0.45rem 0.95rem;
-		border-radius: 999px;
-		transition:
-			background 0.2s ease,
-			color 0.2s ease;
-	}
-
-	.site-header nav a:hover {
-		color: var(--text);
-		background: var(--surface-2);
-	}
-
-	.site-header nav a.active {
-		color: #fff;
-		background: var(--grad);
-		box-shadow: var(--shadow-sm);
-	}
-
-	/* ── Main ───────────────────────────────────────────── */
-	main {
-		max-width: 980px;
-		margin: 0 auto;
-		padding: 1.75rem 1.25rem 3rem;
-	}
-
-	h1 {
-		font-size: clamp(2.4rem, 6vw, 3.6rem);
-		margin: 0 0 0.2rem;
-	}
-
-	.subtitle {
-		color: var(--muted);
-		margin: 0 0 1.5rem;
-		font-weight: 500;
-	}
-
-	/* ── Tablas ─────────────────────────────────────────── */
-	.card {
-		background: var(--surface);
-		border: 1px solid var(--border);
-		border-radius: var(--radius);
-		box-shadow: var(--shadow-sm);
-		overflow: hidden;
-	}
-
-	table {
-		width: 100%;
-		border-collapse: collapse;
-		font-size: 0.95rem;
-	}
-
-	th,
-	td {
-		padding: 0.7rem 0.8rem;
-		text-align: left;
-		border-bottom: 1px solid var(--border);
-	}
-
-	tbody tr:last-child td {
-		border-bottom: none;
-	}
-
-	thead th {
-		color: var(--muted);
-		font-size: 0.72rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		background: var(--surface-2);
-	}
-
-	tbody tr {
-		transition: background 0.18s ease;
-	}
-
-	tbody tr:hover {
-		background: var(--surface-2);
-	}
-
-	.num {
-		text-align: right;
-		font-variant-numeric: tabular-nums;
-	}
-
-	/* ── Footer ─────────────────────────────────────────── */
-	.site-footer {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 0.6rem;
-		padding: 2rem 1rem 2.5rem;
-		color: var(--muted);
-		font-size: 0.85rem;
-	}
-
-	.foot-logo {
-		height: 26px;
-		opacity: 0.7;
-	}
-
-	/* ── Animaciones suaves ─────────────────────────────── */
-	@keyframes fadeUp {
-		from {
-			opacity: 0;
-			transform: translateY(14px);
-		}
-		to {
-			opacity: 1;
-			transform: none;
-		}
-	}
-
-	@keyframes pop {
-		from {
-			opacity: 0;
-			transform: scale(0.96);
-		}
-		to {
-			opacity: 1;
-			transform: none;
-		}
-	}
-
-	.reveal {
-		animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
-	}
-
-	/* ── Responsive global ─────────────────────────────── */
-
-	/* Wrapper de scroll horizontal para tablas en pantallas pequeñas.
-	   Se aplica desde las páginas con <div class="table-scroll"><table>…</table></div> */
-	.table-scroll {
-		overflow-x: auto;
-		-webkit-overflow-scrolling: touch;
-	}
-
-	@media (max-width: 600px) {
-		main {
-			padding: 1.1rem 0.85rem 2.5rem;
-		}
-
-		.site-header {
-			padding: 0.5rem 0.85rem;
-		}
-
-		.brand-logo {
-			height: 34px;
-		}
-
-		.brand-name {
-			font-size: 1.1rem;
-		}
-
-		.site-header nav a {
-			font-size: 0.85rem;
-			padding: 0.38rem 0.7rem;
-		}
-
-		th,
-		td {
-			padding: 0.55rem 0.6rem;
-			font-size: 0.88rem;
-		}
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		*,
-		*::before,
-		*::after {
-			animation-duration: 0.001ms !important;
-			animation-iteration-count: 1 !important;
-			transition-duration: 0.001ms !important;
-		}
-	}
-
-	/* ── Loader de navegación ───────────────────────────── */
-	#nav-loader {
-		position: fixed;
-		inset: 0;
-		z-index: 999;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background: rgba(244, 241, 251, 0.88);
-		backdrop-filter: blur(8px);
-		opacity: 0;
-		pointer-events: none;
-		transition: opacity 0.4s ease;
-	}
-
-	#nav-loader.is-visible {
-		opacity: 1;
-		pointer-events: all;
-	}
-
-	.nav-ball {
-		width: 3.5rem;
-		height: 3.5rem;
-		animation: roll 0.75s linear infinite;
-	}
-
-	@keyframes roll {
-		from { transform: rotate(0deg) translateX(0); }
-		25%  { transform: rotate(90deg) translateX(8px); }
-		50%  { transform: rotate(180deg) translateX(0); }
-		75%  { transform: rotate(270deg) translateX(-8px); }
-		to   { transform: rotate(360deg) translateX(0); }
 	}
 </style>
