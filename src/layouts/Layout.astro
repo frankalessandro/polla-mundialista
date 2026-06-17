@@ -7,8 +7,8 @@ interface Props {
   description?: string;
 }
 
-const { title = 'Polla Mundialista', description = 'Sigue la polla mundialista de la Copa del Mundo 2026. Apuestas, clasificación y resultados en tiempo real.' } = Astro.props;
-const fullTitle = title === 'Polla Mundialista' ? title : `${title} · Polla Mundialista`;
+const { title, description = 'Sigue la polla mundialista de la Copa del Mundo 2026. Apuestas, clasificación y resultados en tiempo real.' } = Astro.props;
+const fullTitle = title ? `${title} · Polla Mundialista` : 'Polla Mundialista · Apuestas y Puntos Copa del Mundo 2026';
 const ogImage = new URL('/og-banner.png', Astro.site).toString();
 const canonicalUrl = Astro.url.href;
 const leagueBadge = await getLeagueBadge();
@@ -34,8 +34,8 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
 		<meta property="og:title" content={fullTitle} />
 		<meta property="og:description" content={description} />
 		<meta property="og:image" content={ogImage} />
-		<meta property="og:image:width" content="739" />
-		<meta property="og:image:height" content="301" />
+		<meta property="og:image:width" content="1424" />
+		<meta property="og:image:height" content="752" />
 		<meta property="og:image:alt" content="Polla Mundialista · Copa del Mundo 2026" />
 
 		<!-- Twitter Card -->
