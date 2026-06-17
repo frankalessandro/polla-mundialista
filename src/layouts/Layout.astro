@@ -4,10 +4,13 @@ import { getLeagueBadge } from '../lib/sportsdb.ts';
 
 interface Props {
   title?: string;
+  description?: string;
 }
 
-const { title = 'Polla Mundialista' } = Astro.props;
+const { title = 'Polla Mundialista', description = 'Sigue la polla mundialista de la Copa del Mundo 2026. Apuestas, clasificación y resultados en tiempo real.' } = Astro.props;
 const fullTitle = title === 'Polla Mundialista' ? title : `${title} · Polla Mundialista`;
+const ogImage = new URL('/og-banner.png', Astro.site).toString();
+const canonicalUrl = Astro.url.href;
 const leagueBadge = await getLeagueBadge();
 const path = Astro.url.pathname;
 const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
@@ -20,6 +23,27 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="icon" type="image/png" href="/Ball.png" />
 		<meta name="generator" content={Astro.generator} />
+		<meta name="description" content={description} />
+		<link rel="canonical" href={canonicalUrl} />
+
+		<!-- Open Graph -->
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content="Polla Mundialista" />
+		<meta property="og:locale" content="es_ES" />
+		<meta property="og:url" content={canonicalUrl} />
+		<meta property="og:title" content={fullTitle} />
+		<meta property="og:description" content={description} />
+		<meta property="og:image" content={ogImage} />
+		<meta property="og:image:width" content="739" />
+		<meta property="og:image:height" content="301" />
+		<meta property="og:image:alt" content="Polla Mundialista · Copa del Mundo 2026" />
+
+		<!-- Twitter Card -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={fullTitle} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={ogImage} />
+
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
@@ -67,7 +91,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
 
 		<footer class="flex items-center justify-center gap-2.5 px-4 py-8 text-muted text-sm">
 			<img src={leagueBadge} alt="" class="h-[26px] opacity-70" />
-			<span>Polla Mundialista · Copa del Mundo 2026</span>
+			<span>Polla Mundialista · Copa del Mundo 2026 · <a href="https://github.com/frankalessandro" target="_blank" rel="noopener noreferrer" class="hover:text-primary transition-colors">@frankalessandro</a></span>
 		</footer>
 
 		<div id="nav-loader" aria-hidden="true">
