@@ -1,54 +1,169 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import StandingsTable from '../components/StandingsTable.astro';
-import LiveBadge from '../components/LiveBadge.astro';
+import MatchCard from '../components/MatchCard.astro';
 import { getMatches } from '../lib/matchSource.ts';
-import { getLeagueBadge } from '../lib/sportsdb.ts';
-import { buildStandings } from '../lib/scoring.ts';
-import { participants } from '../data/participants.ts';
+import { matchesByGroup, matchesByDate } from '../lib/views.ts';
 
 const matches = await getMatches();
-const leagueBadge = await getLeagueBadge();
-const standings = buildStandings(matches, participants);
-const playedCount = matches.filter((m) => m.result !== null).length;
-const liveMatches = matches.filter((m) => m.live);
+const byGroup = [...matchesByGroup(matches).entries()];
+const byDate = matchesByDate(matches);
+
+const playedCount = matches.filter((m) => m.result !== null && !m.live).length;
+const liveCount = matches.filter((m) => m.live).length;
+const remaining = matches.length - playedCount - liveCount;
+
+const dateFmt = new Intl.DateTimeFormat('es', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+});
+const formatDate = (iso: string) => dateFmt.format(new Date(`${iso}T00:00:00`));
 ---
 
-<Layout title="Clasificación general">
-  <section class="hero reveal flex items-center gap-5 border border-border rounded-2xl p-[1.5rem_1.75rem] mb-6 [background:var(--grad-soft)] [box-shadow:var(--shadow-sm)] max-[540px]:flex-col max-[540px]:text-center">
-    <img src={leagueBadge} alt="FIFA World Cup" class="h-[92px] w-auto [filter:drop-shadow(0_8px_16px_rgba(110,80,190,.28))] [animation:float_4s_ease-in-out_infinite]" />
-    <div>
+<Layout title="Partidos">
+  <section class="reveal flex items-center gap-5 border border-border rounded-2xl p-[1.5rem_1.75rem] mb-6 [background:var(--grad-soft)] [box-shadow:var(--shadow-sm)] max-[540px]:flex-col max-[540px]:text-center">
+    <img src="/Ball.png" alt="" class="h-22 w-auto ball-hero" />
+    <div class="flex-1 min-w-0">
       <p class="m-0 font-bold text-[.78rem] tracking-[.14em] uppercase text-primary">Copa del Mundo 2026</p>
-      <h1>Clasificación</h1>
-      <p class="text-muted mt-1.5 mb-0 font-medium">
-        {participants.length} participantes · {playedCount} de {matches.length} partidos jugados
-      </p>
+      <h1 class="my-0.5">Partidos</h1>
+      <p class="text-muted mt-1.5 mb-0 font-medium">Fase de grupos · {matches.length} partidos</p>
+    </div>
+    <div class="flex gap-3 shrink-0 max-[540px]:gap-4">
+      <div class="stat">
+        <span class="stat-num">{playedCount}</span>
+        <span class="stat-label">Jugados</span>
+      </div>
+      {liveCount > 0 && (
+        <div class="stat">
+          <span class="stat-num live">{liveCount}</span>
+          <span class="stat-label">En vivo</span>
+        </div>
+      )}
+      <div class="stat">
+        <span class="stat-num muted">{remaining}</span>
+        <span class="stat-label">Pendientes</span>
+      </div>
     </div>
   </section>
 
-  {liveMatches.length > 0 && (
-    <div class="reveal bg-surface border border-[rgba(255,93,122,.3)] rounded-2xl p-[.9rem_1.1rem] mb-6 [box-shadow:var(--shadow-sm)]">
-      <div class="flex items-center gap-2.5 flex-wrap text-text">
-        <LiveBadge label="En vivo" />
-        <strong>Clasificación provisional</strong> — los puntos pueden cambiar
-      </div>
-      <div class="flex flex-wrap gap-2 mt-3">
-        {liveMatches.map((m) => (
-          <a href={`/partido/${m.id}`} class="bg-surface-2 border border-border rounded-full px-3 py-1 text-[.85rem] text-text transition-[transform,box-shadow] duration-[.18s] hover:-translate-y-0.5 hover:[box-shadow:var(--shadow-sm)]">
-            {m.home} <b class="text-live">{m.result!.home}-{m.result!.away}</b> {m.away}
-          </a>
-        ))}
-      </div>
-    </div>
-  )}
-
-  {playedCount === 0 && (
-    <p class="reveal bg-surface border border-border border-l-4 border-l-primary-2 rounded-xl p-[.85rem_1.1rem] text-muted mb-6">
-      Aún no hay resultados cargados: todos los puntajes están en cero hasta que se jueguen los partidos.
-    </p>
-  )}
-
-  <div class="card reveal" style="animation-delay:.08s">
-    <StandingsTable rows={standings} />
+  <div class="reveal inline-flex gap-1.5 mb-7 bg-surface border border-border rounded-full p-[.3rem] [box-shadow:var(--shadow-sm)]" role="tablist">
+    <button type="button" class="tab is-active" data-view="grupo">Por grupo</button>
+    <button type="button" class="tab" data-view="fecha">Por fecha</button>
   </div>
+
+  <section data-panel="grupo">
+    {byGroup.map(([group, ms]) => (
+      <div class="mb-9">
+        <h2 class="flex items-center gap-2 text-[1.45rem] mb-3.5 text-text capitalize">
+          <span class="w-2.5 h-2.5 rounded-full [background:var(--grad)]"></span>
+          Grupo {group}
+        </h2>
+        <div class="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-3.5">
+          {ms.map((m) => <MatchCard match={m} />)}
+        </div>
+      </div>
+    ))}
+  </section>
+
+  <section data-panel="fecha" hidden>
+    {byDate.map((bucket) => (
+      <div class="mb-9" data-date={bucket.date}>
+        <h2 class="flex items-center gap-2 text-[1.45rem] mb-3.5 text-text capitalize">
+          <span class="w-2.5 h-2.5 rounded-full [background:var(--grad)]"></span>
+          {formatDate(bucket.date)}
+        </h2>
+        <div class="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-3.5">
+          {bucket.matches.map((m) => <MatchCard match={m} />)}
+        </div>
+      </div>
+    ))}
+  </section>
 </Layout>
+
+<script>
+  const tabs = document.querySelectorAll<HTMLButtonElement>('.tab');
+  const panels = document.querySelectorAll<HTMLElement>('[data-panel]');
+
+  function scrollToToday() {
+    const d = new Date();
+    const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const panel = document.querySelector<HTMLElement>('[data-panel="fecha"]');
+    if (!panel) return;
+
+    const buckets = Array.from(panel.querySelectorAll<HTMLElement>('[data-date]'));
+    const target = buckets.find((b) => (b.dataset.date ?? '') >= today) ?? buckets.at(-1);
+
+    if (target) {
+      const headerH = document.querySelector('.site-header')?.getBoundingClientRect().height ?? 0;
+      const top = target.getBoundingClientRect().top + window.scrollY - headerH - 12;
+      window.scrollTo({ top, behavior: 'instant' });
+    }
+  }
+
+  tabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const view = tab.dataset.view;
+      tabs.forEach((t) => t.classList.toggle('is-active', t === tab));
+      panels.forEach((p) => { p.hidden = p.dataset.panel !== view; });
+      if (view === 'fecha') requestAnimationFrame(scrollToToday);
+    });
+  });
+</script>
+
+<style>
+  .ball-hero {
+    filter: drop-shadow(0 8px 16px rgba(110, 80, 190, .28));
+    animation: ballSpin 8s linear infinite;
+    transform-origin: center;
+  }
+
+  @keyframes ballSpin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
+  }
+
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    line-height: 1;
+    color: var(--primary);
+    letter-spacing: 0.02em;
+  }
+
+  .stat-num.live  { color: var(--live); }
+  .stat-num.muted { color: var(--muted); }
+
+  .stat-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+
+  .tab {
+    background: transparent;
+    color: #8480a3;
+    border: none;
+    border-radius: 999px;
+    padding: .5rem 1.15rem;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color .2s ease, background .2s ease;
+  }
+  .tab:hover { color: #2a2747; }
+  .tab.is-active {
+    color: #fff;
+    background: var(--grad);
+    box-shadow: var(--shadow-sm);
+  }
+  .site-header { /* referenced in JS */ }
+</style>

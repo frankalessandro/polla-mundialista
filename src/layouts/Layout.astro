@@ -51,12 +51,12 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
 				<a href="/"
 					class={`font-semibold text-[.95rem] px-4 py-[.45rem] rounded-full transition-all duration-200 ${isActive('/') ? 'text-white shadow-sm' : 'text-muted hover:text-text hover:bg-surface-2'}`}
 					style={isActive('/') ? 'background: var(--grad)' : ''}>
-					Clasificación
-				</a>
-				<a href="/partidos"
-					class={`font-semibold text-[.95rem] px-4 py-[.45rem] rounded-full transition-all duration-200 ${isActive('/partidos') ? 'text-white shadow-sm' : 'text-muted hover:text-text hover:bg-surface-2'}`}
-					style={isActive('/partidos') ? 'background: var(--grad)' : ''}>
 					Partidos
+				</a>
+				<a href="/clasificacion"
+					class={`font-semibold text-[.95rem] px-4 py-[.45rem] rounded-full transition-all duration-200 ${isActive('/clasificacion') ? 'text-white shadow-sm' : 'text-muted hover:text-text hover:bg-surface-2'}`}
+					style={isActive('/clasificacion') ? 'background: var(--grad)' : ''}>
+					Clasificación
 				</a>
 			</nav>
 		</header>
