@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import PredictionsTable from '../../components/PredictionsTable.astro';
+import Flag from '../../components/Flag.astro';
 import { getMatches } from '../../lib/matchSource.ts';
 import { predictionsForMatch } from '../../lib/views.ts';
 import { participants } from '../../data/participants.ts';
@@ -12,6 +13,7 @@ export async function getStaticPaths() {
 
 const { match } = Astro.props;
 const played = match.result !== null;
+const live = match.live === true;
 const rows = predictionsForMatch(match, participants);
 ---
 
@@ -20,17 +22,26 @@ const rows = predictionsForMatch(match, participants);
 
 	<div class="header">
 		<div class="teams">
-			<span class="team">{match.home}</span>
-			<span class={`score ${played ? 'played' : ''}`}>
+			<span class="team home"><span>{match.home}</span> <Flag team={match.home} size={28} /></span>
+			<span class={`score ${played ? 'played' : ''} ${live ? 'live' : ''}`}>
 				{played ? `${match.result!.home} - ${match.result!.away}` : 'vs'}
 			</span>
-			<span class="team">{match.away}</span>
+			<span class="team away"><Flag team={match.away} size={28} /> <span>{match.away}</span></span>
 		</div>
 		<p class="subtitle meta">
 			Grupo {match.group} · {match.date} · {match.time} · {match.stadium}
-			{!played && ' · No jugado'}
+			{live ? ' · 🔴 En vivo' : !played && ' · No jugado'}
 		</p>
 	</div>
+
+	{
+		live && (
+			<p class="live-note">
+				🔴 Partido en vivo: el marcador es parcial y los puntos mostrados son
+				<strong> provisionales</strong>, pueden cambiar hasta el final.
+			</p>
+		)
+	}
 
 	<h2>Apuestas ({rows.length})</h2>
 	<PredictionsTable rows={rows} played={played} />
@@ -55,6 +66,20 @@ const rows = predictionsForMatch(match, participants);
 		font-weight: 700;
 	}
 
+	.team {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+	}
+
+	.team.home {
+		justify-content: flex-end;
+	}
+
+	.team.away {
+		justify-content: flex-start;
+	}
+
 	.score {
 		color: var(--muted);
 		font-variant-numeric: tabular-nums;
@@ -62,6 +87,19 @@ const rows = predictionsForMatch(match, participants);
 
 	.score.played {
 		color: var(--accent);
+	}
+
+	.score.live {
+		color: #ff6369;
+	}
+
+	.live-note {
+		background: rgba(229, 72, 77, 0.12);
+		border: 1px solid #e5484d;
+		border-radius: 8px;
+		padding: 0.6rem 0.9rem;
+		margin: 0 0 1.25rem;
+		font-size: 0.9rem;
 	}
 
 	.meta {

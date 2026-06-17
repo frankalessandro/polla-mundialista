@@ -1,5 +1,6 @@
 ---
 import type { Match } from '../data/matches.ts';
+import Flag from './Flag.astro';
 
 interface Props {
   match: Match;
@@ -7,20 +8,22 @@ interface Props {
 
 const { match } = Astro.props;
 const played = match.result !== null;
+const live = match.live === true;
 const score = played ? `${match.result!.home} - ${match.result!.away}` : 'vs';
 ---
 
 <a href={`/partido/${match.id}`} class="match-card">
 	<div class="teams">
-		<span class="team home">{match.home}</span>
-		<span class={`score ${played ? 'played' : ''}`}>{score}</span>
-		<span class="team away">{match.away}</span>
+		<span class="team home">{match.home} <Flag team={match.home} /></span>
+		<span class={`score ${played ? 'played' : ''} ${live ? 'live' : ''}`}>{score}</span>
+		<span class="team away"><Flag team={match.away} /> {match.away}</span>
 	</div>
 	<div class="meta">
 		<span>Grupo {match.group}</span>
 		<span>{match.date} · {match.time}</span>
 		<span class="stadium">{match.stadium}</span>
 	</div>
+	{live && <span class="badge live">🔴 En vivo</span>}
 	{!played && <span class="badge">No jugado</span>}
 </a>
 
@@ -68,6 +71,10 @@ const score = played ? `${match.result!.home} - ${match.result!.away}` : 'vs';
 		font-weight: 700;
 	}
 
+	.score.live {
+		color: #ff6369;
+	}
+
 	.meta {
 		display: flex;
 		justify-content: center;
@@ -89,5 +96,10 @@ const score = played ? `${match.result!.home} - ${match.result!.away}` : 'vs';
 		border: 1px solid var(--border);
 		border-radius: 999px;
 		padding: 0.1rem 0.5rem;
+	}
+
+	.badge.live {
+		color: #ff6369;
+		border-color: #ff6369;
 	}
 </style>

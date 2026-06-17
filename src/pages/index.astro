@@ -8,6 +8,7 @@ import { participants } from '../data/participants.ts';
 const matches = await getMatches();
 const standings = buildStandings(matches, participants);
 const playedCount = matches.filter((m) => m.result !== null).length;
+const liveMatches = matches.filter((m) => m.live);
 ---
 
 <Layout title="Clasificación general">
@@ -15,6 +16,21 @@ const playedCount = matches.filter((m) => m.result !== null).length;
 	<p class="subtitle">
 		{participants.length} participantes · {playedCount} de {matches.length} partidos jugados
 	</p>
+	{
+		liveMatches.length > 0 && (
+			<p class="notice live">
+				<strong>🔴 Clasificación provisional</strong> — hay {liveMatches.length}{' '}
+				partido{liveMatches.length > 1 ? 's' : ''} en vivo; los puntos pueden cambiar:
+				<span class="live-list">
+					{liveMatches.map((m) => (
+						<a href={`/partido/${m.id}`}>
+							{m.home} {m.result!.home}-{m.result!.away} {m.away}
+						</a>
+					))}
+				</span>
+			</p>
+		)
+	}
 	{
 		playedCount === 0 && (
 			<p class="notice">
@@ -35,5 +51,16 @@ const playedCount = matches.filter((m) => m.result !== null).length;
 		padding: 0.75rem 1rem;
 		color: var(--muted);
 		margin-bottom: 1.25rem;
+	}
+
+	.notice.live {
+		border-left-color: #e5484d;
+	}
+
+	.live-list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem 1rem;
+		margin-top: 0.4rem;
 	}
 </style>

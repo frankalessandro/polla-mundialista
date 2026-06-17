@@ -17,13 +17,15 @@ const breakdown = breakdownForParticipant(id, matches, participants);
 const standings = buildStandings(matches, participants);
 const position = standings.findIndex((r) => r.participantId === id) + 1;
 const row = standings.find((r) => r.participantId === id)!;
+const hasLive = breakdown.some((b) => b.match.live);
 ---
 
 <Layout title={participant.name}>
 	<p class="subtitle"><a href="/">← Clasificación</a></p>
 	<h1>{participant.name}</h1>
 	<p class="subtitle">
-		Puesto #{position} · {row.total} puntos · {row.played} partidos jugados
+		Puesto #{position} · {row.total} puntos{hasLive ? ' (provisional 🔴)' : ''} ·{' '}
+		{row.played} partidos jugados
 	</p>
 
 	{
@@ -43,11 +45,12 @@ const row = standings.find((r) => r.participantId === id)!;
 				</thead>
 				<tbody>
 					{breakdown.map((b) => (
-						<tr>
+						<tr class={b.match.live ? 'live' : ''}>
 							<td>
 								<a href={`/partido/${b.match.id}`}>
 									{b.match.home} vs {b.match.away}
 								</a>
+								{b.match.live && <span class="live-tag">🔴 en vivo</span>}
 								<span class="muted"> · Grupo {b.match.group} · {b.match.date}</span>
 							</td>
 							<td class="num">{b.prediction.home} - {b.prediction.away}</td>
@@ -69,5 +72,17 @@ const row = standings.find((r) => r.participantId === id)!;
 
 	.empty {
 		color: var(--muted);
+	}
+
+	tr.live {
+		background: rgba(229, 72, 77, 0.08);
+	}
+
+	.live-tag {
+		color: #ff6369;
+		font-size: 0.75rem;
+		font-weight: 600;
+		margin-left: 0.4rem;
+		white-space: nowrap;
 	}
 </style>

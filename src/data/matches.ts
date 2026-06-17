@@ -10,6 +10,12 @@ export type Match = {
   away: string;
   stadium: string;
   result: Score | null;
+  /**
+   * `true` cuando `result` es un marcador EN VIVO (parcial): los puntos
+   * derivados son provisionales y pueden cambiar. Lo fija {@link getMatches}
+   * desde el estado de la API; en los datos estáticos siempre va ausente.
+   */
+  live?: boolean;
 };
 
 export const matches: Match[] = [
