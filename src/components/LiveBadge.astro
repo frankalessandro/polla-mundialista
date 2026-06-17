@@ -1,64 +1,19 @@
 ---
 interface Props {
-  /** Variante compacta para usar en línea dentro de tablas. */
   small?: boolean;
-  /** Texto a mostrar junto al punto. */
   label?: string;
 }
 
 const { small = false, label = 'En vivo' } = Astro.props;
 ---
 
-<span class={`live-badge ${small ? 'small' : ''}`}>
-	<span class="dot"></span>
-	{label}
+<span class={`inline-flex items-center gap-1.5 font-bold uppercase tracking-[.05em] text-live bg-[rgba(255,93,122,.1)] border border-[rgba(255,93,122,.35)] rounded-full whitespace-nowrap ${small ? 'text-[.62rem] px-1.5 py-0' : 'text-[.72rem] px-2 py-0.5'}`}>
+  <span class={`rounded-full bg-live dot ${small ? 'w-[.42rem] h-[.42rem]' : 'w-2 h-2'}`}></span>
+  {label}
 </span>
 
 <style>
-	.live-badge {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.4rem;
-		font-weight: 700;
-		font-size: 0.72rem;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		color: var(--live);
-		background: rgba(255, 93, 122, 0.1);
-		border: 1px solid rgba(255, 93, 122, 0.35);
-		border-radius: 999px;
-		padding: 0.15rem 0.55rem;
-		white-space: nowrap;
-	}
-
-	.live-badge.small {
-		font-size: 0.62rem;
-		padding: 0.05rem 0.4rem;
-	}
-
-	.dot {
-		width: 0.5rem;
-		height: 0.5rem;
-		border-radius: 50%;
-		background: var(--live);
-		box-shadow: 0 0 0 0 rgba(255, 93, 122, 0.6);
-		animation: live-pulse 1.4s ease-out infinite;
-	}
-
-	.small .dot {
-		width: 0.42rem;
-		height: 0.42rem;
-	}
-
-	@keyframes live-pulse {
-		0% {
-			box-shadow: 0 0 0 0 rgba(255, 93, 122, 0.55);
-		}
-		70% {
-			box-shadow: 0 0 0 0.5rem rgba(255, 93, 122, 0);
-		}
-		100% {
-			box-shadow: 0 0 0 0 rgba(255, 93, 122, 0);
-		}
-	}
+  .dot {
+    animation: live-pulse 1.4s ease-out infinite;
+  }
 </style>
