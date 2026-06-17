@@ -48,7 +48,7 @@ const formatDate = (iso: string) => dateFmt.format(new Date(`${iso}T00:00:00`));
 	<section data-panel="fecha" hidden>
 		{
 			byDate.map((bucket) => (
-				<div class="bucket">
+				<div class="bucket" data-date={bucket.date}>
 					<h2 class="bucket-title">
 						<span class="dot" />
 						{formatDate(bucket.date)}
@@ -67,6 +67,25 @@ const formatDate = (iso: string) => dateFmt.format(new Date(`${iso}T00:00:00`));
 <script>
 	const tabs = document.querySelectorAll<HTMLButtonElement>('.tab');
 	const panels = document.querySelectorAll<HTMLElement>('[data-panel]');
+
+	function scrollToToday() {
+		const d = new Date();
+		const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+		const panel = document.querySelector<HTMLElement>('[data-panel="fecha"]');
+		if (!panel) return;
+
+		const buckets = Array.from(panel.querySelectorAll<HTMLElement>('[data-date]'));
+		// Primer bucket cuya fecha >= hoy; si todos pasaron, el último
+		const target =
+			buckets.find((b) => (b.dataset.date ?? '') >= today) ?? buckets.at(-1);
+
+		if (target) {
+			const headerH = document.querySelector('.site-header')?.getBoundingClientRect().height ?? 0;
+			const top = target.getBoundingClientRect().top + window.scrollY - headerH - 12;
+			window.scrollTo({ top, behavior: 'instant' });
+		}
+	}
+
 	tabs.forEach((tab) => {
 		tab.addEventListener('click', () => {
 			const view = tab.dataset.view;
@@ -74,6 +93,9 @@ const formatDate = (iso: string) => dateFmt.format(new Date(`${iso}T00:00:00`));
 			panels.forEach((p) => {
 				p.hidden = p.dataset.panel !== view;
 			});
+			if (view === 'fecha') {
+				requestAnimationFrame(scrollToToday);
+			}
 		});
 	});
 </script>
