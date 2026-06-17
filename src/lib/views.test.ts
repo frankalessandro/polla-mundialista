@@ -57,10 +57,10 @@ test('predictionsForMatch con resultado → calcula y ordena por puntos desc', (
   assert.deepEqual(rows.map((r) => r.points), [5, 2]);
 });
 
-test('breakdownForParticipant sólo incluye partidos jugados, cronológico', () => {
+test('breakdownForParticipant incluye TODAS las apuestas, jugadas o no', () => {
   const matches = [
     mk({ id: 1, date: '2026-06-11', result: { home: 2, away: 1 } }),
-    mk({ id: 2, date: '2026-06-12', result: null }), // no jugado → fuera
+    mk({ id: 2, date: '2026-06-12', result: null }), // no jugado → result/points null
   ];
   const ana: Participant[] = [
     {
@@ -73,7 +73,12 @@ test('breakdownForParticipant sólo incluye partidos jugados, cronológico', () 
     },
   ];
   const rows = breakdownForParticipant(1, matches, ana);
-  assert.equal(rows.length, 1);
-  assert.equal(rows[0].match.id, 1);
+  assert.equal(rows.length, 2);
+  assert.deepEqual(rows.map((r) => r.match.id), [1, 2]); // cronológico
+  // Jugado: resultado y puntos presentes.
+  assert.deepEqual(rows[0].result, { home: 2, away: 1 });
   assert.equal(rows[0].points, 5);
+  // No jugado: resultado y puntos en null.
+  assert.equal(rows[1].result, null);
+  assert.equal(rows[1].points, null);
 });

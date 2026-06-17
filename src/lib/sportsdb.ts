@@ -79,7 +79,23 @@ type SportsDbEvent = {
   intHomeScore: string | null;
   intAwayScore: string | null;
   strStatus: string | null;
+  strLeagueBadge: string | null;
 };
+
+/** Logo del Mundial: se captura del payload; este valor sirve de respaldo. */
+const FALLBACK_LEAGUE_BADGE =
+  'https://r2.thesportsdb.com/images/media/league/badge/e7er5g1696521789.png';
+let leagueBadge: string | null = null;
+
+/** URL del logo de la liga (FIFA World Cup). Memoizado vía {@link fetchResults}. */
+export async function getLeagueBadge(): Promise<string> {
+  try {
+    await fetchResults();
+  } catch {
+    /* si la API falla usamos el respaldo */
+  }
+  return leagueBadge ?? FALLBACK_LEAGUE_BADGE;
+}
 
 /** Estados de TheSportsDB que indican un partido ya terminado. */
 const FINISHED = new Set(['FT', 'AET', 'PEN', 'Match Finished']);
@@ -121,6 +137,7 @@ async function load(): Promise<Map<string, ResultEntry>> {
 
   for (const { events } of responses) {
     for (const e of events ?? []) {
+      leagueBadge ??= e.strLeagueBadge; // logo del Mundial (igual en todos)
       const status = e.strStatus ?? '';
       const finished = FINISHED.has(status);
       const live = !finished && LIVE.has(status);

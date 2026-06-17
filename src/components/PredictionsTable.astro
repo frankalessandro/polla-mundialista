@@ -8,8 +8,11 @@ interface Props {
 }
 
 const { rows, played } = Astro.props;
+const pointClass = (p: number | null) =>
+  p === null ? '' : p >= 5 ? 'p-top' : p >= 2 ? 'p-mid' : p > 0 ? 'p-low' : 'p-zero';
 ---
 
+<div class="table-scroll">
 <table>
 	<thead>
 		<tr>
@@ -22,13 +25,13 @@ const { rows, played } = Astro.props;
 		{
 			rows.map((row) => (
 				<tr>
-					<td>
+					<td class="name">
 						<a href={`/participante/${row.participantId}`}>{row.name}</a>
 					</td>
-					<td class="num">{row.home} - {row.away}</td>
+					<td class="num bet">{row.home} - {row.away}</td>
 					{played && (
 						<td class="num">
-							<strong>{row.points}</strong>
+							<span class={`pts ${pointClass(row.points)}`}>{row.points}</span>
 						</td>
 					)}
 				</tr>
@@ -36,3 +39,52 @@ const { rows, played } = Astro.props;
 		}
 	</tbody>
 </table>
+</div>
+
+<style>
+	.name a {
+		color: var(--text);
+		font-weight: 600;
+	}
+
+	.name a:hover {
+		color: var(--primary);
+	}
+
+	.bet {
+		font-family: 'Bebas Neue', sans-serif;
+		font-size: 1.1rem;
+		letter-spacing: 0.03em;
+		color: var(--muted);
+	}
+
+	.pts {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 1.7rem;
+		padding: 0.1rem 0.45rem;
+		border-radius: 999px;
+		font-weight: 700;
+		font-size: 0.85rem;
+	}
+
+	.p-top {
+		background: linear-gradient(135deg, #c9f7e5, #a7f3d0);
+		color: #0f7a57;
+	}
+
+	.p-mid {
+		background: #e7e0ff;
+		color: #5b3fc4;
+	}
+
+	.p-low {
+		background: var(--surface-2);
+		color: var(--muted);
+	}
+
+	.p-zero {
+		color: var(--muted);
+	}
+</style>

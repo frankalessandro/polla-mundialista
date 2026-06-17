@@ -1,66 +1,164 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import StandingsTable from '../components/StandingsTable.astro';
+import LiveBadge from '../components/LiveBadge.astro';
 import { getMatches } from '../lib/matchSource.ts';
+import { getLeagueBadge } from '../lib/sportsdb.ts';
 import { buildStandings } from '../lib/scoring.ts';
 import { participants } from '../data/participants.ts';
 
 const matches = await getMatches();
+const leagueBadge = await getLeagueBadge();
 const standings = buildStandings(matches, participants);
 const playedCount = matches.filter((m) => m.result !== null).length;
 const liveMatches = matches.filter((m) => m.live);
 ---
 
 <Layout title="Clasificación general">
-	<h1>Clasificación general</h1>
-	<p class="subtitle">
-		{participants.length} participantes · {playedCount} de {matches.length} partidos jugados
-	</p>
+	<section class="hero reveal">
+		<img src={leagueBadge} alt="FIFA World Cup" class="hero-logo" />
+		<div class="hero-text">
+			<p class="kicker">Copa del Mundo 2026</p>
+			<h1>Clasificación</h1>
+			<p class="subtitle">
+				{participants.length} participantes · {playedCount} de {matches.length} partidos jugados
+			</p>
+		</div>
+	</section>
+
 	{
 		liveMatches.length > 0 && (
-			<p class="notice live">
-				<strong>🔴 Clasificación provisional</strong> — hay {liveMatches.length}{' '}
-				partido{liveMatches.length > 1 ? 's' : ''} en vivo; los puntos pueden cambiar:
-				<span class="live-list">
+			<div class="live-banner reveal">
+				<div class="live-head">
+					<LiveBadge label="En vivo" />
+					<strong>Clasificación provisional</strong> — los puntos pueden cambiar
+				</div>
+				<div class="live-list">
 					{liveMatches.map((m) => (
-						<a href={`/partido/${m.id}`}>
-							{m.home} {m.result!.home}-{m.result!.away} {m.away}
+						<a href={`/partido/${m.id}`} class="live-chip">
+							{m.home} <b>{m.result!.home}-{m.result!.away}</b> {m.away}
 						</a>
 					))}
-				</span>
-			</p>
+				</div>
+			</div>
 		)
 	}
 	{
 		playedCount === 0 && (
-			<p class="notice">
-				Aún no hay resultados cargados: todos los puntajes están en cero hasta que
-				se jueguen los partidos.
+			<p class="notice reveal">
+				Aún no hay resultados cargados: todos los puntajes están en cero hasta que se
+				jueguen los partidos.
 			</p>
 		)
 	}
-	<StandingsTable rows={standings} />
+
+	<div class="card reveal" style="animation-delay:.08s">
+		<StandingsTable rows={standings} />
+	</div>
 </Layout>
 
 <style>
-	.notice {
-		background: var(--surface);
+	.hero {
+		display: flex;
+		align-items: center;
+		gap: 1.25rem;
+		background: var(--grad-soft);
 		border: 1px solid var(--border);
-		border-left: 3px solid var(--accent);
-		border-radius: 8px;
-		padding: 0.75rem 1rem;
-		color: var(--muted);
-		margin-bottom: 1.25rem;
+		border-radius: var(--radius);
+		padding: 1.5rem 1.75rem;
+		margin-bottom: 1.5rem;
+		box-shadow: var(--shadow-sm);
 	}
 
-	.notice.live {
-		border-left-color: #e5484d;
+	.hero-logo {
+		height: 92px;
+		width: auto;
+		filter: drop-shadow(0 8px 16px rgba(110, 80, 190, 0.28));
+		animation: float 4s ease-in-out infinite;
+	}
+
+	@keyframes float {
+		0%,
+		100% {
+			transform: translateY(0);
+		}
+		50% {
+			transform: translateY(-8px);
+		}
+	}
+
+	.kicker {
+		margin: 0;
+		font-weight: 700;
+		font-size: 0.78rem;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--primary);
+	}
+
+	.hero .subtitle {
+		margin: 0.35rem 0 0;
+	}
+
+	.live-banner {
+		background: var(--surface);
+		border: 1px solid rgba(255, 93, 122, 0.3);
+		border-radius: var(--radius);
+		padding: 0.9rem 1.1rem;
+		margin-bottom: 1.5rem;
+		box-shadow: var(--shadow-sm);
+	}
+
+	.live-head {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		flex-wrap: wrap;
+		color: var(--text);
 	}
 
 	.live-list {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0.4rem 1rem;
-		margin-top: 0.4rem;
+		gap: 0.5rem;
+		margin-top: 0.7rem;
+	}
+
+	.live-chip {
+		background: var(--surface-2);
+		border: 1px solid var(--border);
+		border-radius: 999px;
+		padding: 0.3rem 0.75rem;
+		font-size: 0.85rem;
+		color: var(--text);
+		transition:
+			transform 0.18s ease,
+			box-shadow 0.18s ease;
+	}
+
+	.live-chip b {
+		color: var(--live);
+	}
+
+	.live-chip:hover {
+		transform: translateY(-2px);
+		box-shadow: var(--shadow-sm);
+	}
+
+	.notice {
+		background: var(--surface);
+		border: 1px solid var(--border);
+		border-left: 4px solid var(--primary-2);
+		border-radius: 12px;
+		padding: 0.85rem 1.1rem;
+		color: var(--muted);
+		margin-bottom: 1.5rem;
+	}
+
+	@media (max-width: 540px) {
+		.hero {
+			flex-direction: column;
+			text-align: center;
+		}
 	}
 </style>

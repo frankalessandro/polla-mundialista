@@ -1,5 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import Flag from '../../components/Flag.astro';
+import LiveBadge from '../../components/LiveBadge.astro';
 import { getMatches } from '../../lib/matchSource.ts';
 import { breakdownForParticipant } from '../../lib/views.ts';
 import { buildStandings } from '../../lib/scoring.ts';
@@ -18,71 +20,211 @@ const standings = buildStandings(matches, participants);
 const position = standings.findIndex((r) => r.participantId === id) + 1;
 const row = standings.find((r) => r.participantId === id)!;
 const hasLive = breakdown.some((b) => b.match.live);
+const exact = breakdown.filter((b) => b.points === 5).length;
+const pointClass = (p: number) => (p >= 5 ? 'p-top' : p >= 2 ? 'p-mid' : p > 0 ? 'p-low' : 'p-zero');
 ---
 
 <Layout title={participant.name}>
-	<p class="subtitle"><a href="/">← Clasificación</a></p>
-	<h1>{participant.name}</h1>
-	<p class="subtitle">
-		Puesto #{position} · {row.total} puntos{hasLive ? ' (provisional 🔴)' : ''} ·{' '}
-		{row.played} partidos jugados
-	</p>
+	<p class="back reveal"><a href="/">← Clasificación</a></p>
+
+	<section class="profile reveal">
+		<div class="rank-badge">#{position}</div>
+		<div class="who">
+			<h1>{participant.name}</h1>
+			<div class="stats">
+				<span class="stat">
+					<b>{row.total}</b> puntos
+					{hasLive && <LiveBadge small label="Provisional" />}
+				</span>
+				<span class="stat"><b>{exact}</b> exactos</span>
+				<span class="stat"><b>{row.played}</b> jugados</span>
+			</div>
+		</div>
+	</section>
 
 	{
 		breakdown.length === 0 ? (
-			<p class="empty">
+			<p class="empty reveal">
 				Todavía no hay partidos jugados, así que aún no se han ganado puntos.
 			</p>
 		) : (
-			<table>
-				<thead>
-					<tr>
-						<th>Partido</th>
-						<th class="num">Apuesta</th>
-						<th class="num">Resultado</th>
-						<th class="num">Puntos</th>
-					</tr>
-				</thead>
-				<tbody>
-					{breakdown.map((b) => (
-						<tr class={b.match.live ? 'live' : ''}>
-							<td>
-								<a href={`/partido/${b.match.id}`}>
-									{b.match.home} vs {b.match.away}
-								</a>
-								{b.match.live && <span class="live-tag">🔴 en vivo</span>}
-								<span class="muted"> · Grupo {b.match.group} · {b.match.date}</span>
-							</td>
-							<td class="num">{b.prediction.home} - {b.prediction.away}</td>
-							<td class="num">{b.result.home} - {b.result.away}</td>
-							<td class="num"><strong>{b.points}</strong></td>
-						</tr>
-					))}
-				</tbody>
-			</table>
+			<div class="card reveal" style="animation-delay:.06s">
+				<div class="table-scroll">
+					<table>
+						<thead>
+							<tr>
+								<th>Partido</th>
+								<th class="num">Apuesta</th>
+								<th class="num hide-sm">Resultado</th>
+								<th class="num">Pts</th>
+							</tr>
+						</thead>
+						<tbody>
+							{breakdown.map((b) => (
+								<tr class={b.match.live ? 'is-live' : ''}>
+									<td class="match-cell">
+										<a class="match-link" href={`/partido/${b.match.id}`}>
+											<Flag team={b.match.home} size={14} />
+											<span class="vs">{b.match.home} vs {b.match.away}</span>
+											<Flag team={b.match.away} size={14} />
+										</a>
+										{b.match.live && <LiveBadge small />}
+										<span class="muted">
+											Gr. {b.match.group} · {b.match.date}
+											<span class="show-sm">
+												{' '}·{' '}
+												{b.result
+													? `${b.result.home}-${b.result.away}`
+													: 'No jugado'}
+											</span>
+										</span>
+									</td>
+									<td class="num bet">{b.prediction.home} - {b.prediction.away}</td>
+									<td class="num bet strong hide-sm">
+										{b.result ? `${b.result.home} - ${b.result.away}` : <span class="pending">No jugado</span>}
+									</td>
+									<td class="num">
+										{b.points === null ? (
+											<span class="pending">—</span>
+										) : (
+											<span class={`pts ${pointClass(b.points)}`}>{b.points}</span>
+										)}
+									</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</div>
+			</div>
 		)
 	}
 </Layout>
 
 <style>
-	.muted {
+	.back {
+		margin: 0 0 1rem;
+	}
+
+	.profile {
+		display: flex;
+		align-items: center;
+		gap: 1.1rem;
+		background: var(--grad-soft);
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		padding: 1.35rem 1.5rem;
+		margin-bottom: 1.5rem;
+		box-shadow: var(--shadow-sm);
+	}
+
+	.rank-badge {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 64px;
+		height: 64px;
+		border-radius: 18px;
+		font-family: 'Bebas Neue', sans-serif;
+		font-size: 1.9rem;
+		color: #fff;
+		background: var(--grad);
+		box-shadow: var(--shadow-sm);
+	}
+
+	.who h1 {
+		font-size: clamp(2rem, 5vw, 2.8rem);
+		margin: 0 0 0.4rem;
+	}
+
+	.stats {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem 1.1rem;
 		color: var(--muted);
-		font-size: 0.85rem;
+		font-size: 0.95rem;
+	}
+
+	.stat {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+	}
+
+	.stat b {
+		color: var(--text);
+		font-size: 1.05rem;
+	}
+
+	.match-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		color: var(--text);
+		font-weight: 600;
+	}
+
+	.match-link:hover .vs {
+		color: var(--primary);
+	}
+
+	.muted {
+		display: block;
+		color: var(--muted);
+		font-size: 0.78rem;
+		margin-top: 0.15rem;
+	}
+
+	.bet {
+		font-family: 'Bebas Neue', sans-serif;
+		font-size: 1.1rem;
+		letter-spacing: 0.03em;
+		color: var(--muted);
+	}
+
+	.bet.strong {
+		color: var(--text);
+	}
+
+	.is-live {
+		background: rgba(255, 93, 122, 0.06);
+	}
+
+	.pending {
+		font-family: 'Outfit', sans-serif;
+		font-size: 0.78rem;
+		font-weight: 500;
+		color: var(--muted);
+		letter-spacing: 0;
 	}
 
 	.empty {
 		color: var(--muted);
 	}
 
-	tr.live {
-		background: rgba(229, 72, 77, 0.08);
+	.pts {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 1.7rem;
+		padding: 0.1rem 0.45rem;
+		border-radius: 999px;
+		font-weight: 700;
+		font-size: 0.85rem;
 	}
 
-	.live-tag {
-		color: #ff6369;
-		font-size: 0.75rem;
-		font-weight: 600;
-		margin-left: 0.4rem;
-		white-space: nowrap;
+	.p-top {
+		background: linear-gradient(135deg, #c9f7e5, #a7f3d0);
+		color: #0f7a57;
+	}
+	.p-mid {
+		background: #e7e0ff;
+		color: #5b3fc4;
+	}
+	.p-low {
+		background: var(--surface-2);
+		color: var(--muted);
+	}
+	.p-zero {
+		color: var(--muted);
 	}
 </style>
