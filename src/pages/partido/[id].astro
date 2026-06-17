@@ -27,18 +27,18 @@ const rows = predictionsForMatch(match, participants);
       {live && <LiveBadge />}
     </div>
 
-    <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-4 text-[1.3rem] font-bold">
-      <span class="flex items-center justify-end gap-2.5 min-w-0">
-        <span class="truncate">{match.home}</span>
-        <Flag team={match.home} size={34} />
-      </span>
+    <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-3 text-[1.3rem] font-bold">
+      <div class="flex items-center justify-end gap-2.5">
+        <span class="text-right leading-tight line-clamp-2">{match.home}</span>
+        <span class="flex-none"><Flag team={match.home} size={34} /></span>
+      </div>
       <span class={`font-['Bebas_Neue'] text-[2.6rem] tracking-[.04em] leading-none max-[520px]:text-[2rem] ${played ? 'text-primary' : live ? 'text-live' : 'text-muted'}`}>
         {played ? `${match.result!.home} - ${match.result!.away}` : 'vs'}
       </span>
-      <span class="flex items-center gap-2.5 min-w-0">
-        <Flag team={match.away} size={34} />
-        <span class="truncate">{match.away}</span>
-      </span>
+      <div class="flex items-center gap-2.5">
+        <span class="flex-none"><Flag team={match.away} size={34} /></span>
+        <span class="leading-tight line-clamp-2">{match.away}</span>
+      </div>
     </div>
 
     <p class="mt-4 mb-0 text-muted text-[.9rem] font-medium">
@@ -60,6 +60,6 @@ const rows = predictionsForMatch(match, participants);
   </h2>
 
   <div class="card reveal" style="animation-delay:.06s">
-    <PredictionsTable rows={rows} played={played} />
+    <PredictionsTable rows={rows} played={played} match={match} />
   </div>
 </Layout>
