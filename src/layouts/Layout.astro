@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import { getLeagueBadge } from '../lib/sportsdb.ts';
+import { Analytics } from '@vercel/analytics/astro';
 
 interface Props {
   title?: string;
@@ -94,7 +95,9 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
 			<span>Polla Mundialista · Copa del Mundo 2026 · <a href="https://github.com/frankalessandro" target="_blank" rel="noopener noreferrer" class="hover:text-primary transition-colors">@frankalessandro</a></span>
 		</footer>
 
-		<div id="nav-loader" aria-hidden="true">
+		<Analytics />
+
+	<div id="nav-loader" aria-hidden="true">
 			<img src="/Ball.png" alt="" class="nav-ball" />
 		</div>
 	</body>
