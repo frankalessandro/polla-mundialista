@@ -49,36 +49,52 @@ const pointClass = (p: number) => (p >= 5 ? 'p-top' : p >= 2 ? 'p-mid' : p > 0 ?
 			</p>
 		) : (
 			<div class="card reveal" style="animation-delay:.06s">
-				<table>
-					<thead>
-						<tr>
-							<th>Partido</th>
-							<th class="num">Apuesta</th>
-							<th class="num">Resultado</th>
-							<th class="num">Pts</th>
-						</tr>
-					</thead>
-					<tbody>
-						{breakdown.map((b) => (
-							<tr class={b.match.live ? 'is-live' : ''}>
-								<td>
-									<a class="match-link" href={`/partido/${b.match.id}`}>
-										<Flag team={b.match.home} size={16} />
-										<span class="vs">{b.match.home} vs {b.match.away}</span>
-										<Flag team={b.match.away} size={16} />
-									</a>
-									{b.match.live && <LiveBadge small />}
-									<span class="muted">Grupo {b.match.group} · {b.match.date}</span>
-								</td>
-								<td class="num bet">{b.prediction.home} - {b.prediction.away}</td>
-								<td class="num bet strong">{b.result.home} - {b.result.away}</td>
-								<td class="num">
-									<span class={`pts ${pointClass(b.points)}`}>{b.points}</span>
-								</td>
+				<div class="table-scroll">
+					<table>
+						<thead>
+							<tr>
+								<th>Partido</th>
+								<th class="num">Apuesta</th>
+								<th class="num hide-sm">Resultado</th>
+								<th class="num">Pts</th>
 							</tr>
-						))}
-					</tbody>
-				</table>
+						</thead>
+						<tbody>
+							{breakdown.map((b) => (
+								<tr class={b.match.live ? 'is-live' : ''}>
+									<td class="match-cell">
+										<a class="match-link" href={`/partido/${b.match.id}`}>
+											<Flag team={b.match.home} size={14} />
+											<span class="vs">{b.match.home} vs {b.match.away}</span>
+											<Flag team={b.match.away} size={14} />
+										</a>
+										{b.match.live && <LiveBadge small />}
+										<span class="muted">
+											Gr. {b.match.group} · {b.match.date}
+											<span class="show-sm">
+												{' '}·{' '}
+												{b.result
+													? `${b.result.home}-${b.result.away}`
+													: 'No jugado'}
+											</span>
+										</span>
+									</td>
+									<td class="num bet">{b.prediction.home} - {b.prediction.away}</td>
+									<td class="num bet strong hide-sm">
+										{b.result ? `${b.result.home} - ${b.result.away}` : <span class="pending">No jugado</span>}
+									</td>
+									<td class="num">
+										{b.points === null ? (
+											<span class="pending">—</span>
+										) : (
+											<span class={`pts ${pointClass(b.points)}`}>{b.points}</span>
+										)}
+									</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</div>
 			</div>
 		)
 	}
@@ -171,6 +187,14 @@ const pointClass = (p: number) => (p >= 5 ? 'p-top' : p >= 2 ? 'p-mid' : p > 0 ?
 
 	.is-live {
 		background: rgba(255, 93, 122, 0.06);
+	}
+
+	.pending {
+		font-family: 'Outfit', sans-serif;
+		font-size: 0.78rem;
+		font-weight: 500;
+		color: var(--muted);
+		letter-spacing: 0;
 	}
 
 	.empty {

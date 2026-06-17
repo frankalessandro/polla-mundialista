@@ -87,14 +87,17 @@ export function predictionsForMatch(
 export type BreakdownRow = {
   match: Match;
   prediction: Score;
-  result: Score;
-  points: number;
+  /** Marcador real, o `null` si el partido todavía no se ha jugado. */
+  result: Score | null;
+  /** Puntos obtenidos, o `null` mientras el partido no se haya jugado. */
+  points: number | null;
 };
 
 /**
- * Desglose de un participante: por cada partido YA JUGADO, su predicción, el
- * resultado real y los puntos obtenidos. Responde a "ver los puntos que ha
- * ganado y con cuál partido". Ordenado cronológicamente.
+ * Desglose de un participante: TODAS sus apuestas (incluidos los partidos que
+ * todavía no se han jugado), con la predicción, el marcador real —o `null` si
+ * no se ha jugado— y los puntos obtenidos —`null` mientras no se juegue—.
+ * Ordenado cronológicamente.
  */
 export function breakdownForParticipant(
   participantId: number,
@@ -106,14 +109,15 @@ export function breakdownForParticipant(
 
   const rows: BreakdownRow[] = [];
   for (const match of matches) {
-    if (!match.result) continue; // sólo partidos jugados
     const pred = participant.predictions.find((p) => p.matchId === match.id);
-    if (!pred) continue;
+    if (!pred) continue; // el participante no apostó este partido
     rows.push({
       match,
       prediction: { home: pred.home, away: pred.away },
       result: match.result,
-      points: scorePrediction(pred.home, pred.away, match.result.home, match.result.away),
+      points: match.result
+        ? scorePrediction(pred.home, pred.away, match.result.home, match.result.away)
+        : null,
     });
   }
 

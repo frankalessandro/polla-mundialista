@@ -12,6 +12,7 @@ const pointClass = (p: number | null) =>
   p === null ? '' : p >= 5 ? 'p-top' : p >= 2 ? 'p-mid' : p > 0 ? 'p-low' : 'p-zero';
 ---
 
+<div class="table-scroll">
 <table>
 	<thead>
 		<tr>
@@ -38,6 +39,7 @@ const pointClass = (p: number | null) =>
 		}
 	</tbody>
 </table>
+</div>
 
 <style>
 	.name a {

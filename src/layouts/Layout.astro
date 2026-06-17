@@ -301,6 +301,44 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
 		animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 	}
 
+	/* ── Responsive global ─────────────────────────────── */
+
+	/* Wrapper de scroll horizontal para tablas en pantallas pequeñas.
+	   Se aplica desde las páginas con <div class="table-scroll"><table>…</table></div> */
+	.table-scroll {
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	@media (max-width: 600px) {
+		main {
+			padding: 1.1rem 0.85rem 2.5rem;
+		}
+
+		.site-header {
+			padding: 0.5rem 0.85rem;
+		}
+
+		.brand-logo {
+			height: 34px;
+		}
+
+		.brand-name {
+			font-size: 1.1rem;
+		}
+
+		.site-header nav a {
+			font-size: 0.85rem;
+			padding: 0.38rem 0.7rem;
+		}
+
+		th,
+		td {
+			padding: 0.55rem 0.6rem;
+			font-size: 0.88rem;
+		}
+	}
+
 	@media (prefers-reduced-motion: reduce) {
 		*,
 		*::before,
