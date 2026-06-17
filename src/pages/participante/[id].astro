@@ -70,13 +70,7 @@ const pointClass = (p: number) => (p >= 5 ? 'p-top' : p >= 2 ? 'p-mid' : p > 0 ?
 										</a>
 										{b.match.live && <LiveBadge small />}
 										<span class="muted">
-											Gr. {b.match.group} · {b.match.date}
-											<span class="show-sm">
-												{' '}·{' '}
-												{b.result
-													? `${b.result.home}-${b.result.away}`
-													: 'No jugado'}
-											</span>
+											Grupo {`${b.match.group}   |    ${b.match.date}`}
 										</span>
 									</td>
 									<td class="num bet">{b.prediction.home} - {b.prediction.away}</td>
