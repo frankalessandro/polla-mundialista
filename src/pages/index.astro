@@ -94,8 +94,8 @@ const formatDate = (iso: string) => dateFmt.format(new Date(`${iso}T00:00:00`));
     const target = buckets.find((b) => (b.dataset.date ?? '') >= today) ?? buckets.at(-1);
 
     if (target) {
-      const headerH = document.querySelector('.site-header')?.getBoundingClientRect().height ?? 0;
-      const top = target.getBoundingClientRect().top + window.scrollY - headerH - 12;
+      const headerH = document.querySelector('header')?.getBoundingClientRect().height ?? 0;
+      const top = target.getBoundingClientRect().top + window.scrollY - headerH - 16;
       window.scrollTo({ top, behavior: 'instant' });
     }
   }
@@ -165,5 +165,4 @@ const formatDate = (iso: string) => dateFmt.format(new Date(`${iso}T00:00:00`));
     background: var(--grad);
     box-shadow: var(--shadow-sm);
   }
-  .site-header { /* referenced in JS */ }
 </style>
