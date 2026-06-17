@@ -46,8 +46,27 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
 			<img src={leagueBadge} alt="" class="foot-logo" />
 			<span>Polla Mundialista · Copa del Mundo 2026</span>
 		</footer>
+
+		<div id="nav-loader" aria-hidden="true">
+			<img src="/Ball.png" alt="" class="nav-ball" />
+		</div>
 	</body>
 </html>
+
+<script>
+	const loader = document.getElementById('nav-loader')!;
+
+	document.addEventListener('click', (e) => {
+		const anchor = (e.target as Element).closest('a');
+		if (!anchor) return;
+		const href = anchor.getAttribute('href');
+		if (!href || href.startsWith('#') || href.startsWith('http') || anchor.target === '_blank') return;
+		loader.classList.add('is-visible');
+	});
+
+	// Ocultar si el usuario vuelve con el botón atrás (página en caché)
+	window.addEventListener('pageshow', () => loader.classList.remove('is-visible'));
+</script>
 
 <style is:global>
 	:root {
@@ -346,5 +365,39 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
 			animation-iteration-count: 1 !important;
 			transition-duration: 0.001ms !important;
 		}
+	}
+
+	/* ── Loader de navegación ───────────────────────────── */
+	#nav-loader {
+		position: fixed;
+		inset: 0;
+		z-index: 999;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: rgba(244, 241, 251, 0.88);
+		backdrop-filter: blur(8px);
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 0.4s ease;
+	}
+
+	#nav-loader.is-visible {
+		opacity: 1;
+		pointer-events: all;
+	}
+
+	.nav-ball {
+		width: 3.5rem;
+		height: 3.5rem;
+		animation: roll 0.75s linear infinite;
+	}
+
+	@keyframes roll {
+		from { transform: rotate(0deg) translateX(0); }
+		25%  { transform: rotate(90deg) translateX(8px); }
+		50%  { transform: rotate(180deg) translateX(0); }
+		75%  { transform: rotate(270deg) translateX(-8px); }
+		to   { transform: rotate(360deg) translateX(0); }
 	}
 </style>
