@@ -14,71 +14,92 @@ const rankClass = (i: number) => {
 };
 ---
 
-<div class="table-scroll">
-  <table id="standings-table">
-    <thead>
-      <tr>
-        <th class="num">#</th>
-        <th>Participante</th>
-        <th class="num" data-col="pts" data-sort="desc" title="Puntos totales">
-          Pts
-          <svg class="sort-icon" viewBox="0 0 8 12" width="8" height="12" aria-hidden="true">
-            <path class="up" d="M4 0L0 5h8z" /><path class="down" d="M4 12L0 7h8z" />
-          </svg>
-        </th>
-        <th class="num hide-sm" data-col="exactos" title="Marcadores exactos (5 pts)">
-          Exactos
-          <svg class="sort-icon" viewBox="0 0 8 12" width="8" height="12" aria-hidden="true">
-            <path class="up" d="M4 0L0 5h8z" /><path class="down" d="M4 12L0 7h8z" />
-          </svg>
-        </th>
-        <th class="num" data-col="aciertos" title="Resultados acertados (2 o 3 pts)">
-          Aciertos
-          <svg class="sort-icon" viewBox="0 0 8 12" width="8" height="12" aria-hidden="true">
-            <path class="up" d="M4 0L0 5h8z" /><path class="down" d="M4 12L0 7h8z" />
-          </svg>
-        </th>
-        <th class="num hide-sm">Jugados</th>
-      </tr>
-    </thead>
-    <tbody>
-      {
-        rows.map((row, i) => (
-          <tr
-            style={`animation-delay:${Math.min(i * 0.025, 0.5)}s`}
-            class="reveal"
-            data-name={row.name.toLowerCase()}
-            data-pts={row.total}
-            data-exactos={row.exactScores}
-            data-aciertos={row.correctOutcomes}
-            data-jugados={row.played}
-          >
-            <td class="num">
-              <span class={`inline-flex items-center justify-center min-w-[1.6rem] h-[1.6rem] px-1.5 rounded-full font-bold text-[.85rem] ${rankClass(i)}`}>
-                {i + 1}
-              </span>
-            </td>
-            <td class="max-w-40">
-              <a href={`/participante/${row.participantId}`} class="text-text font-semibold hover:text-primary transition-colors">
-                {row.name}
-              </a>
-            </td>
-            <td class="num font-extrabold text-primary text-[1.05rem]">{row.total}</td>
-            <td class="num text-muted hide-sm">{row.exactScores}</td>
-            <td class="num text-muted">{row.correctOutcomes}</td>
-            <td class="num text-muted hide-sm">{row.played}</td>
-          </tr>
-        ))
-      }
-    </tbody>
-  </table>
+<div id="standings-wrapper" data-mode="simple">
+  <div class="table-scroll">
+    <table id="standings-table">
+      <thead>
+        <tr>
+          <th class="num">#</th>
+          <th>Participante</th>
+          <th class="num" data-col="pts" data-sort="desc" title="Puntos totales">
+            Pts
+            <svg class="sort-icon" viewBox="0 0 8 12" width="8" height="12" aria-hidden="true">
+              <path class="up" d="M4 0L0 5h8z" /><path class="down" d="M4 12L0 7h8z" />
+            </svg>
+          </th>
+          <th class="num" data-col="exactos" title="Marcadores exactos (5 pts) — desempate 1">
+            Exactos
+            <svg class="sort-icon" viewBox="0 0 8 12" width="8" height="12" aria-hidden="true">
+              <path class="up" d="M4 0L0 5h8z" /><path class="down" d="M4 12L0 7h8z" />
+            </svg>
+          </th>
+          <th class="num col-detail" data-col="tres" title="Ganador correcto + un gol acertado — desempate 2">
+            3 pts
+            <svg class="sort-icon" viewBox="0 0 8 12" width="8" height="12" aria-hidden="true">
+              <path class="up" d="M4 0L0 5h8z" /><path class="down" d="M4 12L0 7h8z" />
+            </svg>
+          </th>
+          <th class="num col-detail" data-col="dos" title="Ganador o empate simple — desempate 3">
+            2 pts
+            <svg class="sort-icon" viewBox="0 0 8 12" width="8" height="12" aria-hidden="true">
+              <path class="up" d="M4 0L0 5h8z" /><path class="down" d="M4 12L0 7h8z" />
+            </svg>
+          </th>
+          <th class="num col-detail" data-col="uno" title="Un gol acertado, resultado fallado — desempate 4">
+            1 pt
+            <svg class="sort-icon" viewBox="0 0 8 12" width="8" height="12" aria-hidden="true">
+              <path class="up" d="M4 0L0 5h8z" /><path class="down" d="M4 12L0 7h8z" />
+            </svg>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          rows.map((row, i) => (
+            <tr
+              style={`animation-delay:${Math.min(i * 0.025, 0.5)}s`}
+              class="reveal"
+              data-name={row.name.toLowerCase()}
+              data-pts={row.total}
+              data-exactos={row.exactScores}
+              data-tres={row.threePointHits}
+              data-dos={row.twoPointHits}
+              data-uno={row.onePointHits}
+            >
+              <td class="num">
+                <span class={`inline-flex items-center justify-center min-w-[1.6rem] h-[1.6rem] px-1.5 rounded-full font-bold text-[.85rem] ${rankClass(i)}`}>
+                  {i + 1}
+                </span>
+              </td>
+              <td class="max-w-40">
+                <a href={`/participante/${row.participantId}`} class="text-text font-semibold hover:text-primary transition-colors">
+                  {row.name}
+                </a>
+              </td>
+              <td class="num font-extrabold text-primary text-[1.05rem]">{row.total}</td>
+              <td class="num text-muted">{row.exactScores}</td>
+              <td class="num text-muted col-detail">{row.threePointHits}</td>
+              <td class="num text-muted col-detail">{row.twoPointHits}</td>
+              <td class="num text-muted col-detail">{row.onePointHits}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <script>
+  const wrapper = document.getElementById('standings-wrapper') as HTMLElement;
   const table = document.getElementById('standings-table') as HTMLTableElement;
   const tbody = table.querySelector('tbody')!;
   let activeCol = 'pts';
   let activeDir: 'asc' | 'desc' = 'desc';
+
+  // Listen for mode changes dispatched by the toggle outside this component.
+  document.addEventListener('standings:mode', (e) => {
+    wrapper.dataset.mode = (e as CustomEvent<string>).detail;
+  });
 
   function sortBy(col: string, dir: 'asc' | 'desc') {
     activeCol = col;
@@ -114,13 +135,14 @@ const rankClass = (i: number) => {
 </script>
 
 <style>
+  #standings-wrapper[data-mode="simple"] .col-detail { display: none; }
+
   th[data-col] {
     cursor: pointer;
     user-select: none;
     white-space: nowrap;
     transition: color 0.15s, background 0.15s;
   }
-
   th[data-col]:hover {
     color: var(--text);
     background: var(--border);
@@ -133,7 +155,6 @@ const rankClass = (i: number) => {
     position: relative;
     top: -1px;
   }
-
   .sort-icon .up,
   .sort-icon .down {
     fill: currentColor;
@@ -144,13 +165,8 @@ const rankClass = (i: number) => {
   tbody { transition: opacity 0.15s ease; }
 
   th[data-sort] .sort-icon { color: var(--primary); }
-
-  th[data-sort="asc"] .sort-icon .up    { opacity: 1; }
-  th[data-sort="asc"] .sort-icon .down  { opacity: 0.2; }
+  th[data-sort="asc"]  .sort-icon .up   { opacity: 1; }
+  th[data-sort="asc"]  .sort-icon .down { opacity: 0.2; }
   th[data-sort="desc"] .sort-icon .up   { opacity: 0.2; }
   th[data-sort="desc"] .sort-icon .down { opacity: 1; }
-
-  @media (max-width: 600px) {
-    .hide-sm { display: none; }
-  }
 </style>

@@ -113,6 +113,52 @@ export function standingsImpactForMatch(
   );
 }
 
+/**
+ * Historia de posición de un participante partido a partido (orden cronológico).
+ * Para cada partido jugado calcula el puesto acumulado hasta ese momento y
+ * cuántas posiciones ganó/perdió respecto al partido anterior.
+ * `change` positivo = subió; negativo = bajó; 0 = igual.
+ */
+export function participantPositionHistory(
+  participantId: number,
+  matches: Match[],
+  participants: Participant[],
+): Map<number, MatchImpact> {
+  const played = matches
+    .filter((m) => m.result !== null)
+    .sort(
+      (a, b) =>
+        a.date.localeCompare(b.date) ||
+        a.time.localeCompare(b.time) ||
+        a.id - b.id,
+    );
+
+  // Posición inicial antes de cualquier partido (orden de registro, todos a 0)
+  const blank = matches.map((m) => ({ ...m, result: null as Match['result'] }));
+  let prevRank =
+    buildStandings(blank, participants).findIndex(
+      (r) => r.participantId === participantId,
+    ) + 1;
+
+  const playedSet = new Set<number>();
+  const result = new Map<number, MatchImpact>();
+
+  for (const match of played) {
+    playedSet.add(match.id);
+    const partial = matches.map((m) =>
+      playedSet.has(m.id) ? m : { ...m, result: null as Match['result'] },
+    );
+    const rank =
+      buildStandings(partial, participants).findIndex(
+        (r) => r.participantId === participantId,
+      ) + 1;
+    result.set(match.id, { rank, change: prevRank - rank });
+    prevRank = rank;
+  }
+
+  return result;
+}
+
 export type BreakdownRow = {
   match: Match;
   prediction: Score;

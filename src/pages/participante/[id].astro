@@ -3,7 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import Flag from '../../components/Flag.astro';
 import LiveBadge from '../../components/LiveBadge.astro';
 import { getMatches } from '../../lib/matchSource.ts';
-import { breakdownForParticipant } from '../../lib/views.ts';
+import { breakdownForParticipant, participantPositionHistory } from '../../lib/views.ts';
 import { buildStandings } from '../../lib/scoring.ts';
 import { participants } from '../../data/participants.ts';
 
@@ -20,6 +20,7 @@ const standings = buildStandings(matches, participants);
 const position = standings.findIndex((r) => r.participantId === id) + 1;
 const row = standings.find((r) => r.participantId === id)!;
 const hasLive = breakdown.some((b) => b.match.live);
+const impactByMatch = participantPositionHistory(id, matches, participants);
 const exact = breakdown.filter((b) => b.points === 5).length;
 const pointClass = (p: number) => (p >= 5 ? 'p-top' : p >= 2 ? 'p-mid' : p > 0 ? 'p-low' : 'p-zero');
 ---
@@ -39,7 +40,8 @@ const pointClass = (p: number) => (p >= 5 ? 'p-top' : p >= 2 ? 'p-mid' : p > 0 ?
           {hasLive && <LiveBadge small label="Provisional" />}
         </span>
         <span class="inline-flex items-center gap-1.5"><b class="text-text text-[1.05rem]">{exact}</b> exactos</span>
-        <span class="inline-flex items-center gap-1.5"><b class="text-text text-[1.05rem]">{row.correctOutcomes}</b> aciertos</span>
+        <span class="inline-flex items-center gap-1.5"><b class="text-text text-[1.05rem]">{row.threePointHits}</b> de 3 pts</span>
+        <span class="inline-flex items-center gap-1.5"><b class="text-text text-[1.05rem]">{row.twoPointHits}</b> de 2 pts</span>
       </div>
     </div>
   </section>
@@ -58,6 +60,7 @@ const pointClass = (p: number) => (p >= 5 ? 'p-top' : p >= 2 ? 'p-mid' : p > 0 ?
               <th class="num">Apuesta</th>
               <th class="num">Resultado</th>
               <th class="num">Pts</th>
+              <th class="num">Pos.</th>
             </tr>
           </thead>
           <tbody>
@@ -85,6 +88,21 @@ const pointClass = (p: number) => (p >= 5 ? 'p-top' : p >= 2 ? 'p-mid' : p > 0 ?
                     ? <span class="font-['Outfit'] text-[.78rem] font-medium text-muted tracking-normal">—</span>
                     : <span class={`pts ${pointClass(b.points)}`}>{b.points}</span>}
                 </td>
+                <td class="num">
+                  {(() => {
+                    const imp = impactByMatch.get(b.match.id);
+                    if (!imp) return <span class="font-['Outfit'] text-[.78rem] font-medium text-muted tracking-normal">—</span>;
+                    const rankCls = imp.rank === 1 ? 'from-[#ffd86b] to-[#f7b955] text-[#6b4e00]' : imp.rank === 2 ? 'from-[#e9ecf5] to-[#c7cdde] text-[#4a4f63]' : imp.rank === 3 ? 'from-[#f3c08a] to-[#e0a062] text-[#6b3e15]' : 'bg-surface-2 text-muted';
+                    return (
+                      <div class="rank-cell">
+                        <span class={`rank-badge bg-gradient-to-br ${rankCls}`}>#{imp.rank}</span>
+                        {imp.change > 0 && <span class="delta up">↑{imp.change}</span>}
+                        {imp.change < 0 && <span class="delta down">↓{Math.abs(imp.change)}</span>}
+                        {imp.change === 0 && <span class="delta neutral">—</span>}
+                      </div>
+                    );
+                  })()}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -93,3 +111,51 @@ const pointClass = (p: number) => (p >= 5 ? 'p-top' : p >= 2 ? 'p-mid' : p > 0 ?
     </div>
   )}
 </Layout>
+
+<style>
+  .bet {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.03em;
+    color: var(--muted);
+  }
+  .strong { color: var(--text); }
+
+  .pts {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.7rem;
+    padding: 0.1rem 0.45rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.85rem;
+  }
+  .p-top  { background: linear-gradient(135deg, #c9f7e5, #a7f3d0); color: #0f7a57; }
+  .p-mid  { background: #e7e0ff; color: #5b3fc4; }
+  .p-low  { background: var(--surface-2); color: var(--muted); }
+  .p-zero { color: var(--muted); }
+
+  .rank-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    white-space: nowrap;
+  }
+  .rank-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    height: 1.6rem;
+    padding: 0 0.4rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.8rem;
+  }
+  .delta { font-size: 0.75rem; font-weight: 700; min-width: 1.4rem; text-align: left; }
+  .delta.up      { color: #0f7a57; }
+  .delta.down    { color: #c0392b; }
+  .delta.neutral { color: var(--muted); }
+</style>
