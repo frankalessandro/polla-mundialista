@@ -111,7 +111,15 @@ export function buildStandings(
   const results = buildResultsMap(matches);
   return participants
     .map((p) => scoreParticipant(p, results))
-    .sort((a, b) => b.total - a.total);
+    .sort((a, b) => {
+      if (b.total !== a.total) return b.total - a.total;
+      // 1er desempate: más marcadores exactos
+      if (b.exactScores !== a.exactScores) return b.exactScores - a.exactScores;
+      // 2do desempate: más resultados acertados (ganador/empate)
+      if (b.correctOutcomes !== a.correctOutcomes) return b.correctOutcomes - a.correctOutcomes;
+      // Si persiste el empate, conservar orden de registro (sort estable)
+      return 0;
+    });
 }
 
 export type { Prediction };

@@ -1,12 +1,22 @@
 ---
-import type { MatchPredictionRow } from "../lib/views.ts";
+import type { MatchPredictionRow, MatchImpact } from "../lib/views.ts";
+import type { Match } from "../data/matches.ts";
 
 interface Props {
   rows: MatchPredictionRow[];
   played: boolean;
+  match: Match;
+  impact?: Map<number, MatchImpact>;
 }
 
-const { rows, played } = Astro.props;
+const { rows, played, impact } = Astro.props;
+
+const rankClass = (rank: number) => {
+  if (rank === 1) return 'bg-gradient-to-br from-[#ffd86b] to-[#f7b955] text-[#6b4e00]';
+  if (rank === 2) return 'bg-gradient-to-br from-[#e9ecf5] to-[#c7cdde] text-[#4a4f63]';
+  if (rank === 3) return 'bg-gradient-to-br from-[#f3c08a] to-[#e0a062] text-[#6b3e15]';
+  return 'bg-surface-2 text-muted';
+};
 const pointClass = (p: number | null) =>
   p === null
     ? ""
@@ -54,35 +64,64 @@ const pointClass = (p: number | null) =>
               </svg>
             </th>
           )}
+          {impact && (
+            <th class="num" data-col="rank" data-sort="asc" title="Posición en la clasificación general">
+              Pos.
+              <svg class="sort-icon" viewBox="0 0 8 12" width="8" height="12" aria-hidden="true">
+                <path class="up" d="M4 0L0 5h8z" /><path class="down" d="M4 12L0 7h8z" />
+              </svg>
+            </th>
+          )}
         </tr>
       </thead>
       <tbody>
         {
-          rows.map((row) => (
-            <tr data-name={row.name.toLowerCase()} data-pts={row.points ?? -1}>
-              <td>
-                <a
-                  href={`/participante/${row.participantId}`}
-                  class="text-text font-semibold hover:text-primary transition-colors"
-                >
-                  {row.name}
-                </a>
-              </td>
-              <td class="num bet">
-                {row.home} - {row.away}
-              </td>
-              {played && (
-                <td class="num">
-                  <span class={`pts ${pointClass(row.points)}`}>
-                    {row.points}
-                  </span>
+          rows.map((row) => {
+            const imp = impact?.get(row.participantId);
+            return (
+              <tr data-name={row.name.toLowerCase()} data-pts={row.points ?? -1} data-rank={imp?.rank ?? 9999}>
+                <td>
+                  <a
+                    href={`/participante/${row.participantId}`}
+                    class="text-text font-semibold hover:text-primary transition-colors"
+                  >
+                    {row.name}
+                  </a>
                 </td>
-              )}
-            </tr>
-          ))
+                <td class="num bet">
+                  {row.home} - {row.away}
+                </td>
+                {played && (
+                  <td class="num">
+                    <span class={`pts ${pointClass(row.points)}`}>
+                      {row.points}
+                    </span>
+                  </td>
+                )}
+                {imp && (
+                  <td class="num">
+                    <div class="rank-cell">
+                      <span class={`rank-badge ${rankClass(imp.rank)}`}>
+                        #{imp.rank}
+                      </span>
+                      {imp.change > 0 && (
+                        <span class="delta up">↑{imp.change}</span>
+                      )}
+                      {imp.change < 0 && (
+                        <span class="delta down">↓{Math.abs(imp.change)}</span>
+                      )}
+                      {imp.change === 0 && (
+                        <span class="delta neutral">—</span>
+                      )}
+                    </div>
+                  </td>
+                )}
+              </tr>
+            );
+          })
         }
         <tr id="pred-no-results" style="display:none">
-          <td colspan="3" class="text-center text-muted py-6 text-[.9rem]">
+          <td colspan="4" class="text-center text-muted py-6 text-[.9rem]">
             No se encontró ningún participante.
           </td>
         </tr>
@@ -128,8 +167,8 @@ const pointClass = (p: number | null) =>
       requestAnimationFrame(() => {
         const dataRows = Array.from(tbody.querySelectorAll<HTMLTableRowElement>("tr[data-name]"));
         dataRows.sort((a, b) => {
-          const av = col === "name" ? a.dataset.name! : Number(a.dataset.pts);
-          const bv = col === "name" ? b.dataset.name! : Number(b.dataset.pts);
+          const av = col === "name" ? a.dataset.name! : col === "rank" ? Number(a.dataset.rank) : Number(a.dataset.pts);
+          const bv = col === "name" ? b.dataset.name! : col === "rank" ? Number(b.dataset.rank) : Number(b.dataset.pts);
           if (av < bv) return dir === "asc" ? -1 : 1;
           if (av > bv) return dir === "asc" ? 1 : -1;
           return 0;
@@ -209,4 +248,35 @@ const pointClass = (p: number | null) =>
   .p-mid  { background: #e7e0ff; color: #5b3fc4; }
   .p-low  { background: var(--surface-2); color: var(--muted); }
   .p-zero { color: var(--muted); }
+
+  .rank-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    white-space: nowrap;
+  }
+
+  .rank-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    height: 1.6rem;
+    padding: 0 0.4rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.8rem;
+  }
+
+  .delta {
+    font-size: 0.75rem;
+    font-weight: 700;
+    min-width: 1.4rem;
+    text-align: left;
+  }
+
+  .delta.up      { color: #0f7a57; }
+  .delta.down    { color: #c0392b; }
+  .delta.neutral { color: var(--muted); }
 </style>
