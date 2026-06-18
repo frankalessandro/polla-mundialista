@@ -89,7 +89,7 @@ test('buildStandings ordena por total y cuenta exactos', () => {
 
   const ana = table.find((r) => r.name === 'Ana')!;
   assert.equal(ana.exactScores, 1);
-  assert.equal(ana.correctOutcomes, 1); // el partido de 2 puntos
+  assert.equal(ana.twoPointHits, 1); // el partido de 2 puntos
   assert.equal(ana.played, 2); // el no jugado no cuenta
 });
 

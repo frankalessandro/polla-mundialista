@@ -48,14 +48,14 @@ export type StandingRow = {
   name: string;
   /** Suma de puntos sobre todos los partidos jugados. */
   total: number;
-  /** Cuántas veces acertó el marcador exacto (5 puntos). */
+  /** Cuántas veces acertó el marcador exacto (5 puntos). Desempate 1. */
   exactScores: number;
-  /**
-   * Cuántas veces acertó el resultado pero no el marcador exacto
-   * (puntaje 2 o 3). Métrica corregida: NO replica el bug del Excel
-   * que filtraba por puntaje == 3 a secas.
-   */
-  correctOutcomes: number;
+  /** Cuántas veces obtuvo 3 puntos (ganador + un gol). Desempate 2. */
+  threePointHits: number;
+  /** Cuántas veces obtuvo exactamente 2 puntos (ganador/empate simple). Desempate 3. */
+  twoPointHits: number;
+  /** Cuántas veces obtuvo exactamente 1 punto (un gol acertado, resultado fallado). Desempate 4. */
+  onePointHits: number;
   /** Partidos ya jugados que se contabilizaron (resultado disponible). */
   played: number;
 };
@@ -76,7 +76,9 @@ function scoreParticipant(
 ): StandingRow {
   let total = 0;
   let exactScores = 0;
-  let correctOutcomes = 0;
+  let threePointHits = 0;
+  let twoPointHits = 0;
+  let onePointHits = 0;
   let played = 0;
 
   for (const pred of participant.predictions) {
@@ -87,7 +89,9 @@ function scoreParticipant(
     const points = scorePrediction(pred.home, pred.away, real.home, real.away);
     total += points;
     if (points === 5) exactScores += 1;
-    else if (points === 2 || points === 3) correctOutcomes += 1;
+    else if (points === 3) threePointHits += 1;
+    else if (points === 2) twoPointHits += 1;
+    else if (points === 1) onePointHits += 1;
   }
 
   return {
@@ -95,7 +99,9 @@ function scoreParticipant(
     name: participant.name,
     total,
     exactScores,
-    correctOutcomes,
+    threePointHits,
+    twoPointHits,
+    onePointHits,
     played,
   };
 }
@@ -113,11 +119,15 @@ export function buildStandings(
     .map((p) => scoreParticipant(p, results))
     .sort((a, b) => {
       if (b.total !== a.total) return b.total - a.total;
-      // 1er desempate: más marcadores exactos
+      // Desempate 1: más marcadores exactos (5 pts)
       if (b.exactScores !== a.exactScores) return b.exactScores - a.exactScores;
-      // 2do desempate: más resultados acertados (ganador/empate)
-      if (b.correctOutcomes !== a.correctOutcomes) return b.correctOutcomes - a.correctOutcomes;
-      // Si persiste el empate, conservar orden de registro (sort estable)
+      // Desempate 2: más aciertos de 3 pts (ganador + gol)
+      if (b.threePointHits !== a.threePointHits) return b.threePointHits - a.threePointHits;
+      // Desempate 3: más aciertos de 2 pts (ganador/empate simple)
+      if (b.twoPointHits !== a.twoPointHits) return b.twoPointHits - a.twoPointHits;
+      // Desempate 4: más aciertos de 1 pt (gol acertado, resultado fallado)
+      if (b.onePointHits !== a.onePointHits) return b.onePointHits - a.onePointHits;
+      // Desempate 5: decisión manual con administradores (conservar orden de registro)
       return 0;
     });
 }
