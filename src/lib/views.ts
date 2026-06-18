@@ -1,6 +1,6 @@
 import type { Group, Match, Score } from '../data/matches.ts';
 import type { Participant } from '../data/participants.ts';
-import { scorePrediction } from './scoring.ts';
+import { buildStandings, scorePrediction } from './scoring.ts';
 
 /**
  * Helpers de presentación puros (sin Astro) que adaptan el dominio a lo que
@@ -82,6 +82,35 @@ export function predictionsForMatch(
 
   if (match.result) rows.sort((a, b) => (b.points ?? 0) - (a.points ?? 0));
   return rows;
+}
+
+export type MatchImpact = { rank: number; change: number };
+
+/**
+ * Para un partido ya jugado, compara la clasificación con y sin ese partido
+ * para determinar en qué puesto queda cada participante y cuántos puestos ganó/perdió.
+ * `change` positivo = subió puestos; negativo = bajó.
+ */
+export function standingsImpactForMatch(
+  matchId: number,
+  matches: Match[],
+  participants: Participant[],
+): Map<number, MatchImpact> {
+  const withMatch = buildStandings(matches, participants);
+  const withoutMatch = buildStandings(
+    matches.map((m) => (m.id === matchId ? { ...m, result: null } : m)),
+    participants,
+  );
+
+  const prevRanks = new Map(withoutMatch.map((row, i) => [row.participantId, i + 1]));
+
+  return new Map(
+    withMatch.map((row, i) => {
+      const rank = i + 1;
+      const prev = prevRanks.get(row.participantId) ?? rank;
+      return [row.participantId, { rank, change: prev - rank }];
+    }),
+  );
 }
 
 export type BreakdownRow = {

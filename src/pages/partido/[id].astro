@@ -4,7 +4,7 @@ import PredictionsTable from '../../components/PredictionsTable.astro';
 import Flag from '../../components/Flag.astro';
 import LiveBadge from '../../components/LiveBadge.astro';
 import { getMatches } from '../../lib/matchSource.ts';
-import { predictionsForMatch } from '../../lib/views.ts';
+import { predictionsForMatch, standingsImpactForMatch } from '../../lib/views.ts';
 import { participants } from '../../data/participants.ts';
 
 export async function getStaticPaths() {
@@ -15,7 +15,9 @@ export async function getStaticPaths() {
 const { match } = Astro.props;
 const played = match.result !== null;
 const live = match.live === true;
+const matches = await getMatches();
 const rows = predictionsForMatch(match, participants);
+const impact = played ? standingsImpactForMatch(match.id, matches, participants) : undefined;
 ---
 
 <Layout title={`${match.home} vs ${match.away}`}>
@@ -60,6 +62,6 @@ const rows = predictionsForMatch(match, participants);
   </h2>
 
   <div class="card reveal" style="animation-delay:.06s">
-    <PredictionsTable rows={rows} played={played} match={match} />
+    <PredictionsTable rows={rows} played={played} match={match} impact={impact} />
   </div>
 </Layout>
