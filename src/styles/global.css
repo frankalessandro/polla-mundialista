@@ -119,6 +119,36 @@ tbody tr:hover { background: #f3effb; }
 .bet { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 0.03em; color: #8480a3; }
 .bet.strong { color: #2a2747; }
 
+/* ── Rank badge (compartido entre tablas) ─────────────── */
+.rank-cell { display: flex; align-items: center; justify-content: center; gap: .3rem; white-space: nowrap; }
+.rank-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 2rem; height: 1.6rem; padding: 0 .4rem;
+  border-radius: 999px; font-weight: 700; font-size: .8rem;
+}
+.rank-1 { background: linear-gradient(135deg, #ffe87a 0%, #f7c94a 45%, #c88f00 100%); color: #5a3d00; }
+.rank-2 { background: linear-gradient(135deg, #f5f7fb 0%, #d6dcea 50%, #aab3c8 100%); color: #353a50; }
+.rank-3 { background: linear-gradient(135deg, #ffd4a0 0%, #d4884a 50%, #a85c20 100%); color: #5a2e08; }
+.rank-4 { background: linear-gradient(135deg, #b8d8f8 0%, #6aaae8 50%, #3070be 100%); color: #1a3f6e; }
+.rank-5 { background: linear-gradient(135deg, #b4e8b4 0%, #5ec05e 50%, #277a27 100%); color: #134a13; }
+.delta { font-size: .75rem; font-weight: 700; min-width: 1.4rem; text-align: left; }
+.delta.up      { color: #0f7a57; }
+.delta.down    { color: #c0392b; }
+.delta.neutral { color: var(--muted); }
+
+/* ── Columnas ordenables (compartido entre tablas) ─────── */
+th[data-col] { cursor: pointer; user-select: none; white-space: nowrap; transition: color .15s, background .15s; }
+th[data-col]:hover { color: var(--text); background: var(--border); }
+.sort-icon { display: inline-block; vertical-align: middle; margin-left: 3px; position: relative; top: -1px; }
+.sort-icon .up,
+.sort-icon .down { fill: currentColor; opacity: .25; transition: opacity .15s; }
+tbody { transition: opacity .15s ease; }
+th[data-sort] .sort-icon { color: var(--primary); }
+th[data-sort="asc"]  .sort-icon .up    { opacity: 1; }
+th[data-sort="asc"]  .sort-icon .down  { opacity: .2; }
+th[data-sort="desc"] .sort-icon .up    { opacity: .2; }
+th[data-sort="desc"] .sort-icon .down  { opacity: 1; }
+
 /* ── Responsive ───────────────────────────────────────── */
 @media (max-width: 600px) { .hide-sm { display: none; } }
 @media (max-width: 400px) { .hide-xs { display: none; } }

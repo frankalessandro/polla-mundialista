@@ -7,9 +7,11 @@ interface Props {
 
 const { rows } = Astro.props;
 const rankClass = (i: number) => {
-  if (i === 0) return 'bg-gradient-to-br from-[#ffd86b] to-[#f7b955] text-[#6b4e00]';
-  if (i === 1) return 'bg-gradient-to-br from-[#e9ecf5] to-[#c7cdde] text-[#4a4f63]';
-  if (i === 2) return 'bg-gradient-to-br from-[#f3c08a] to-[#e0a062] text-[#6b3e15]';
+  if (i === 0) return 'rank-1';
+  if (i === 1) return 'rank-2';
+  if (i === 2) return 'rank-3';
+  if (i === 3) return 'rank-4';
+  if (i === 4) return 'rank-5';
   return 'bg-surface-2 text-muted';
 };
 ---
@@ -136,37 +138,4 @@ const rankClass = (i: number) => {
 
 <style>
   #standings-wrapper[data-mode="simple"] .col-detail { display: none; }
-
-  th[data-col] {
-    cursor: pointer;
-    user-select: none;
-    white-space: nowrap;
-    transition: color 0.15s, background 0.15s;
-  }
-  th[data-col]:hover {
-    color: var(--text);
-    background: var(--border);
-  }
-
-  .sort-icon {
-    display: inline-block;
-    vertical-align: middle;
-    margin-left: 3px;
-    position: relative;
-    top: -1px;
-  }
-  .sort-icon .up,
-  .sort-icon .down {
-    fill: currentColor;
-    opacity: 0.25;
-    transition: opacity 0.15s;
-  }
-
-  tbody { transition: opacity 0.15s ease; }
-
-  th[data-sort] .sort-icon { color: var(--primary); }
-  th[data-sort="asc"]  .sort-icon .up   { opacity: 1; }
-  th[data-sort="asc"]  .sort-icon .down { opacity: 0.2; }
-  th[data-sort="desc"] .sort-icon .up   { opacity: 0.2; }
-  th[data-sort="desc"] .sort-icon .down { opacity: 1; }
 </style>

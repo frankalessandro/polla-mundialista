@@ -2,6 +2,8 @@
 import Layout from "../layouts/Layout.astro";
 import StandingsTable from "../components/StandingsTable.astro";
 import ParticipantSearch from "../components/ParticipantSearch.astro";
+import DesempateToggle from "../components/DesempateToggle.astro";
+import InfoModal from "../components/InfoModal.astro";
 import LiveBadge from "../components/LiveBadge.astro";
 import { getMatches } from "../lib/matchSource.ts";
 import { getLeagueBadge } from "../lib/sportsdb.ts";
@@ -71,211 +73,18 @@ const liveMatches = matches.filter((m) => m.live);
       </p>
     )
   }
+
   <div class="mb-4">
     <ParticipantSearch />
   </div>
 
-  <div class="reveal desempate-wrap mb-4" style="animation-delay:.06s">
-    <div class="desempate-panel">
-      <span class="panel-text">
-        <span class="panel-title">
-          Criterios de desempate
-          <button
-            id="tiebreaker-btn"
-            aria-label="Ver criterios de desempate"
-            aria-expanded="false"
-            class="info-btn"
-          >
-            <svg viewBox="0 0 20 20" width="14" height="14" fill="none" aria-hidden="true">
-              <circle cx="10" cy="10" r="8.5" stroke="currentColor" stroke-width="1.6"/>
-              <path d="M10 9v5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-              <circle cx="10" cy="6.5" r="0.9" fill="currentColor"/>
-            </svg>
-          </button>
-        </span>
-        <span class="panel-sub">Exactos · 3 pts · 2 pts · 1 pt</span>
-      </span>
-      <label class="toggle-label-wrap" aria-label="Mostrar columnas de desempate">
-        <input type="checkbox" id="full-view-toggle" />
-        <span class="track"><span class="thumb"></span></span>
-      </label>
-    </div>
-
-    <div
-      id="tiebreaker-popover"
-      role="tooltip"
-      hidden
-      class="tiebreaker-popover"
-    >
-      <p class="font-bold text-text mb-2 mt-0">Criterios de desempate</p>
-      <ol class="m-0 pl-5 space-y-1.5 text-muted">
-        <li><span class="text-text font-semibold">1°</span> Más marcadores exactos <span class="text-primary font-bold">(5 pts)</span></li>
-        <li><span class="text-text font-semibold">2°</span> Más aciertos de ganador + un gol <span class="text-primary font-bold">(3 pts)</span></li>
-        <li><span class="text-text font-semibold">3°</span> Más aciertos de ganador o empate simple <span class="text-primary font-bold">(2 pts)</span></li>
-        <li><span class="text-text font-semibold">4°</span> Más aciertos individuales de un gol <span class="text-primary font-bold">(1 pt)</span></li>
-        <li><span class="text-text font-semibold">5°</span> Decisión de mutuo acuerdo con los administradores</li>
-      </ol>
-    </div>
+  <div class="mb-4">
+    <DesempateToggle />
   </div>
+
+  <InfoModal />
 
   <div class="card reveal" style="animation-delay:.08s">
     <StandingsTable rows={standings} />
   </div>
 </Layout>
-
-<style>
-  .desempate-wrap {
-    position: relative;
-    z-index: 10;
-  }
-
-  .desempate-panel {
-    display: flex;
-    align-items: center;
-    gap: .85rem;
-    border: 1px solid var(--border);
-    border-radius: 1.1rem;
-    background: var(--surface);
-    box-shadow: var(--shadow-sm);
-    padding: .75rem 1.1rem;
-    transition: border-color .2s ease;
-  }
-  .desempate-panel:has(input:checked) {
-    border-color: var(--primary);
-    background: var(--grad-soft);
-  }
-
-  .panel-text {
-    display: flex;
-    flex-direction: column;
-    gap: .1rem;
-    flex: 1;
-    min-width: 0;
-  }
-  .panel-title {
-    display: flex;
-    align-items: center;
-    gap: .4rem;
-    font-size: .95rem;
-    font-weight: 600;
-    color: var(--text);
-  }
-  .panel-sub {
-    font-size: .76rem;
-    font-weight: 500;
-    color: var(--muted);
-    letter-spacing: .02em;
-  }
-
-  /* Info button */
-  .info-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 1.4rem;
-    height: 1.4rem;
-    border-radius: 50%;
-    border: none;
-    background: transparent;
-    color: var(--muted);
-    cursor: pointer;
-    padding: 0;
-    flex-shrink: 0;
-    transition: color .15s ease, background .15s ease;
-  }
-  .info-btn:hover { color: var(--primary); background: var(--surface-2); }
-
-  /* Popover */
-  .tiebreaker-popover {
-    position: absolute;
-    left: 0;
-    top: calc(100% + 6px);
-    z-index: 20;
-    width: 20rem;
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 1rem;
-    padding: 1rem 1.1rem;
-    box-shadow: var(--shadow);
-    font-size: .85rem;
-  }
-
-  /* Toggle wrap */
-  .toggle-label-wrap {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    flex-shrink: 0;
-  }
-  .toggle-label-wrap input { position: absolute; opacity: 0; width: 0; height: 0; }
-
-  .track {
-    position: relative;
-    width: 3.4rem;
-    height: 1.85rem;
-    border-radius: 999px;
-    background: #d9d2ef;
-    border: 1px solid rgba(124, 92, 255, .22);
-    box-shadow: inset 0 1px 3px rgba(110, 80, 190, .18);
-    transition: background .25s ease, border-color .25s ease, box-shadow .25s ease;
-    flex-shrink: 0;
-  }
-  .thumb {
-    position: absolute;
-    top: 50%;
-    left: 3px;
-    transform: translateY(-50%);
-    width: 1.45rem;
-    height: 1.45rem;
-    border-radius: 50%;
-    background: #fff;
-    box-shadow: 0 2px 5px rgba(110, 80, 190, .35);
-    transition: left .22s cubic-bezier(.34, 1.56, .64, 1), box-shadow .22s ease;
-  }
-  .desempate-panel input:checked ~ .track {
-    background: var(--grad);
-    border-color: transparent;
-    box-shadow: inset 0 1px 2px rgba(0,0,0,.12), 0 0 0 3px rgba(124, 92, 255, .18);
-  }
-  .desempate-panel input:checked ~ .track .thumb {
-    left: calc(100% - 1.6rem);
-    box-shadow: 0 2px 6px rgba(124, 92, 255, .5);
-  }
-  .desempate-panel input:focus-visible ~ .track {
-    box-shadow: 0 0 0 3px rgba(124, 92, 255, .35);
-  }
-</style>
-
-<script>
-  const toggle = document.getElementById('full-view-toggle') as HTMLInputElement;
-  const btn = document.getElementById('tiebreaker-btn') as HTMLButtonElement;
-  const popover = document.getElementById('tiebreaker-popover') as HTMLDivElement;
-
-  toggle.addEventListener('change', () => {
-    document.dispatchEvent(new CustomEvent('standings:mode', {
-      detail: toggle.checked ? 'full' : 'simple',
-    }));
-  });
-
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const open = !popover.hidden;
-    popover.hidden = open;
-    btn.setAttribute('aria-expanded', String(!open));
-  });
-
-  document.addEventListener('click', (e) => {
-    if (!btn.contains(e.target as Node) && !popover.contains(e.target as Node)) {
-      popover.hidden = true;
-      btn.setAttribute('aria-expanded', 'false');
-    }
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !popover.hidden) {
-      popover.hidden = true;
-      btn.setAttribute('aria-expanded', 'false');
-      btn.focus();
-    }
-  });
-</script>
