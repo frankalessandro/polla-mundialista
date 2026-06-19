@@ -1,0 +1,229 @@
+---
+// Botón flotante + modal de información (criterios de desempate y premios)
+---
+
+<button
+  id="info-fab"
+  aria-label="Ver criterios de desempate y premios"
+  aria-expanded="false"
+  class="info-fab"
+>
+  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true">
+    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+    <path d="M12 11v6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+    <circle cx="12" cy="7.5" r="1.1" fill="currentColor"/>
+  </svg>
+</button>
+
+<div id="info-panel" role="dialog" aria-modal="true" aria-label="Información" hidden class="info-overlay">
+  <div class="info-panel-box">
+    <div class="info-panel-header">
+      <span>Información</span>
+      <button id="info-close" aria-label="Cerrar" class="close-btn">
+        <svg viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+          <path d="M4 4l12 12M16 4L4 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="info-section">
+      <p class="info-section-title">Criterios de desempate</p>
+      <ol class="info-list">
+        <li><span class="info-rank">1°</span> Más marcadores exactos <span class="pts-badge">5 pts</span></li>
+        <li><span class="info-rank">2°</span> Más aciertos de ganador + un gol <span class="pts-badge">3 pts</span></li>
+        <li><span class="info-rank">3°</span> Más aciertos de ganador o empate simple <span class="pts-badge">2 pts</span></li>
+        <li><span class="info-rank">4°</span> Más aciertos individuales de un gol <span class="pts-badge">1 pt</span></li>
+        <li><span class="info-rank">5°</span> Decisión de mutuo acuerdo con los administradores</li>
+      </ol>
+    </div>
+
+    <div class="info-divider"></div>
+
+    <div class="info-section">
+      <p class="info-section-title">Premios</p>
+      <ul class="prizes-list">
+        <li class="prize-row prize-1">
+          <span class="prize-place">1er Puesto <span class="prize-pct">(50%)</span></span>
+          <span class="prize-amount">$1.475.000</span>
+        </li>
+        <li class="prize-row prize-2">
+          <span class="prize-place">2do Puesto <span class="prize-pct">(20%)</span></span>
+          <span class="prize-amount">$590.000</span>
+        </li>
+        <li class="prize-row prize-3">
+          <span class="prize-place">3er Puesto <span class="prize-pct">(15%)</span></span>
+          <span class="prize-amount">$442.500</span>
+        </li>
+        <li class="prize-row prize-4">
+          <span class="prize-place">4to Puesto <span class="prize-pct">(10%)</span></span>
+          <span class="prize-amount">$295.000</span>
+        </li>
+        <li class="prize-row prize-5">
+          <span class="prize-place">5to Puesto <span class="prize-pct">(5%)</span></span>
+          <span class="prize-amount">$147.500</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  const fab = document.getElementById('info-fab') as HTMLButtonElement;
+  const panel = document.getElementById('info-panel') as HTMLDivElement;
+  const closeBtn = document.getElementById('info-close') as HTMLButtonElement;
+
+  function openPanel() {
+    panel.hidden = false;
+    fab.setAttribute('aria-expanded', 'true');
+    closeBtn.focus();
+  }
+
+  function closePanel() {
+    panel.hidden = true;
+    fab.setAttribute('aria-expanded', 'false');
+    fab.focus();
+  }
+
+  fab.addEventListener('click', openPanel);
+  closeBtn.addEventListener('click', closePanel);
+  panel.addEventListener('click', (e) => { if (e.target === panel) closePanel(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !panel.hidden) closePanel(); });
+</script>
+
+<style>
+  .info-fab {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 100;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    border: none;
+    background: var(--grad);
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(110, 80, 190, .45);
+    transition: transform .18s ease, box-shadow .18s ease;
+  }
+  .info-fab:hover {
+    transform: scale(1.08) translateY(-2px);
+    box-shadow: 0 6px 22px rgba(110, 80, 190, .6);
+  }
+  .info-fab:active { transform: scale(.96); }
+
+  .info-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: rgba(0, 0, 0, .42);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 1rem;
+    backdrop-filter: blur(2px);
+    animation: fade-in .18s ease;
+  }
+  @media (min-width: 560px) {
+    .info-overlay { align-items: center; }
+  }
+
+  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slide-up { from { transform: translateY(1.5rem); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+  .info-panel-box {
+    background: #f5f5f7;
+    border: 1px solid #e0e0e5;
+    border-radius: 1.4rem;
+    padding: 1.25rem 1.4rem 1.5rem;
+    width: 100%;
+    max-width: 26rem;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, .18);
+    animation: slide-up .22s cubic-bezier(.34, 1.56, .64, 1);
+  }
+
+  .info-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #1a1a2e;
+  }
+  .close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.8rem;
+    height: 1.8rem;
+    border-radius: 50%;
+    border: none;
+    background: #e2e2e8;
+    color: #555;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+  }
+  .close-btn:hover { background: #ccc; color: #111; }
+
+  .info-section { margin-bottom: .25rem; }
+  .info-section-title {
+    font-weight: 700;
+    font-size: .92rem;
+    color: #1a1a2e;
+    margin: 0 0 .65rem;
+  }
+
+  .info-divider { height: 1px; background: #d8d8e0; margin: 1rem 0; }
+
+  .info-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: .45rem;
+    font-size: .84rem;
+    color: #555;
+  }
+  .info-list li { display: flex; align-items: baseline; gap: .4rem; flex-wrap: wrap; }
+  .info-rank { font-weight: 700; color: #1a1a2e; min-width: 1.6rem; }
+  .pts-badge { font-weight: 700; color: #5b3fc4; font-size: .8rem; }
+
+  .prizes-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: .4rem;
+  }
+  .prize-row {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    border-radius: .8rem;
+    padding: .55rem .8rem;
+    font-size: .85rem;
+    border: 1px solid transparent;
+  }
+  .prize-place { flex: 1; font-weight: 600; color: #1a1a2e; }
+  .prize-pct { font-weight: 400; color: #777; font-size: .78rem; }
+  .prize-amount { font-weight: 800; font-size: .92rem; white-space: nowrap; }
+
+  .prize-1 { background: rgba(255, 216, 107, .15); border-color: rgba(247, 185, 85, .35); }
+  .prize-1 .prize-amount { color: #b08000; }
+  .prize-2 { background: rgba(199, 205, 222, .15); border-color: rgba(199, 205, 222, .4); }
+  .prize-2 .prize-amount { color: #4a4f63; }
+  .prize-3 { background: rgba(243, 192, 138, .15); border-color: rgba(224, 160, 98, .35); }
+  .prize-3 .prize-amount { color: #a0581a; }
+  .prize-4 { background: rgba(74, 144, 217, .12); border-color: rgba(74, 144, 217, .3); }
+  .prize-4 .prize-amount { color: #2266a8; }
+  .prize-5 { background: rgba(111, 174, 111, .12); border-color: rgba(111, 174, 111, .3); }
+  .prize-5 .prize-amount { color: #2d7a2d; }
+</style>
