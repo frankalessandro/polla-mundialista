@@ -80,7 +80,15 @@ export function predictionsForMatch(
     });
   }
 
-  if (match.result) rows.sort((a, b) => (b.points ?? 0) - (a.points ?? 0));
+  if (match.result) {
+    rows.sort((a, b) => {
+      if (b.points !== a.points) return (b.points ?? 0) - (a.points ?? 0);
+      if (a.home !== b.home) return a.home - b.home;
+      return a.away - b.away;
+    });
+  } else {
+    rows.sort((a, b) => a.home - b.home || a.away - b.away);
+  }
   return rows;
 }
 
