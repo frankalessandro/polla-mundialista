@@ -34,6 +34,7 @@ export type DateBucket = { date: string; matches: Match[] };
 export function matchesByDate(matches: Match[]): DateBucket[] {
   const byDate = new Map<string, Match[]>();
   for (const match of matches) {
+    if (!match.date) continue; // sin fecha aún (API no respondió)
     const bucket = byDate.get(match.date);
     if (bucket) bucket.push(match);
     else byDate.set(match.date, [match]);

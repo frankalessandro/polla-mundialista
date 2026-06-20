@@ -80,6 +80,9 @@ type SportsDbEvent = {
   intAwayScore: string | null;
   strStatus: string | null;
   strLeagueBadge: string | null;
+  strDate: string | null;   // "2026-06-19" UTC
+  strTime: string | null;   // "19:00:00" UTC
+  strVenue: string | null;
 };
 
 /** Logo del Mundial: se captura del payload; este valor sirve de respaldo. */
@@ -110,12 +113,45 @@ function pairKey(a: string, b: string): string {
   return [a, b].sort().join(' | ');
 }
 
-export type ResultEntry = { home: string; score: Score; live: boolean };
+export type ResultEntry = {
+  home: string;
+  /** `null` si el partido aún no ha empezado (solo hay datos de fixture). */
+  score: Score | null;
+  live: boolean;
+  /** Fecha en COT (UTC-5), formato "YYYY-MM-DD". */
+  date?: string;
+  /** Hora en COT (UTC-5), formato "HH:MM". */
+  time?: string;
+  /** Estadio tal como devuelve la API. */
+  venue?: string;
+};
+
+/** Convierte fecha+hora UTC a COT (UTC-5). */
+function utcToCot(dateStr: string, timeStr: string): { date: string; time: string } {
+  const [h, m] = timeStr.split(':').map(Number);
+  const [y, mo, d] = dateStr.split('-').map(Number);
+  let cotH = h - 5;
+  let day = d;
+  let month = mo;
+  let year = y;
+  if (cotH < 0) {
+    cotH += 24;
+    // retroceder un día
+    const dt = new Date(y, mo - 1, d - 1);
+    year = dt.getFullYear();
+    month = dt.getMonth() + 1;
+    day = dt.getDate();
+  }
+  const p = (n: number) => String(n).padStart(2, '0');
+  return { date: `${year}-${p(month)}-${p(day)}`, time: `${p(cotH)}:${p(m)}` };
+}
 
 /**
- * Descarga las tres rondas y devuelve un mapa `pairKey -> { home, score }`
- * solo con los partidos que ya tienen ambos marcadores. La descarga se
- * memoiza para no repetir las peticiones por cada página del build.
+ * Descarga las tres rondas y devuelve un mapa `pairKey -> ResultEntry`.
+ * Incluye todos los partidos: los terminados/en vivo llevan `score`; los no
+ * empezados también aparecen para poder actualizar fecha/hora/estadio desde
+ * la API. La descarga se memoiza para no repetir las peticiones por cada
+ * página del build.
  */
 let cache: Promise<Map<string, ResultEntry>> | null = null;
 
@@ -137,21 +173,36 @@ async function load(): Promise<Map<string, ResultEntry>> {
 
   for (const { events } of responses) {
     for (const e of events ?? []) {
-      leagueBadge ??= e.strLeagueBadge; // logo del Mundial (igual en todos)
+      leagueBadge ??= e.strLeagueBadge;
+      const home = TEAM_ES[e.strHomeTeam];
+      const away = TEAM_ES[e.strAwayTeam];
+      if (!home || !away) continue;
+
       const status = e.strStatus ?? '';
       const finished = FINISHED.has(status);
       const live = !finished && LIVE.has(status);
-      // Solo nos interesan partidos terminados o en juego; los no empezados
-      // (NS), aplazados o cancelados se ignoran.
-      if (!finished && !live) continue;
+
+      // fixture data (date/time/venue) para todos los partidos
+      const cot =
+        e.strDate && e.strTime ? utcToCot(e.strDate, e.strTime) : undefined;
+
+      if (!finished && !live) {
+        // Partido no empezado: guardamos solo fixture (score null).
+        results.set(pairKey(home, away), {
+          home, score: null, live: false,
+          date: cot?.date, time: cot?.time, venue: e.strVenue ?? undefined,
+        });
+        continue;
+      }
       if (e.intHomeScore === null || e.intAwayScore === null) continue;
-      const home = TEAM_ES[e.strHomeTeam];
-      const away = TEAM_ES[e.strAwayTeam];
-      if (!home || !away) continue; // equipo no reconocido → se ignora
+
       results.set(pairKey(home, away), {
         home,
         score: { home: Number(e.intHomeScore), away: Number(e.intAwayScore) },
         live,
+        date: cot?.date,
+        time: cot?.time,
+        venue: e.strVenue ?? undefined,
       });
     }
   }
