@@ -75,7 +75,7 @@ const pointClass = (p: number | null) =>
           rows.map((row) => {
             const imp = impact?.get(row.participantId);
             return (
-              <tr data-name={row.name.toLowerCase()} data-pts={row.points ?? -1} data-rank={imp?.rank ?? 9999}>
+              <tr data-name={row.name.toLowerCase()} data-pts={row.points ?? -1} data-rank={imp?.rank ?? 9999} data-home={row.home} data-away={row.away}>
                 <td>
                   <a
                     href={`/participante/${row.participantId}`}
@@ -167,7 +167,10 @@ const pointClass = (p: number | null) =>
           const bv = col === "name" ? b.dataset.name! : col === "rank" ? Number(b.dataset.rank) : Number(b.dataset.pts);
           if (av < bv) return dir === "asc" ? -1 : 1;
           if (av > bv) return dir === "asc" ? 1 : -1;
-          return 0;
+          // Desempate: agrupar predicciones iguales
+          const homeDiff = Number(a.dataset.home) - Number(b.dataset.home);
+          if (homeDiff !== 0) return homeDiff;
+          return Number(a.dataset.away) - Number(b.dataset.away);
         });
         dataRows.forEach((r) => tbody.appendChild(r));
         applyFilter();
