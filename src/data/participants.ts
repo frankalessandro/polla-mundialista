@@ -4335,7 +4335,7 @@ export const participants: Participant[] = [
       { matchId: 26, home: 1, away: 1 },
       { matchId: 27, home: 0, away: 1 },
       { matchId: 28, home: 1, away: 0 },
-      { matchId: 29, home: 0, away: 2 },
+      { matchId: 29, home: 3, away: 0 },
       { matchId: 30, home: 2, away: 1 },
       { matchId: 31, home: 1, away: 1 },
       { matchId: 32, home: 0, away: 1 },

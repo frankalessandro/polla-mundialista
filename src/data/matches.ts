@@ -46,8 +46,8 @@ export const matches: Match[] = [
   // ── Grupo D ──────────────────────────────────────────────────────────────
   { id: 4,  group: 'D', date: '2026-06-12', time: '20:00', home: 'Estados Unidos', away: 'Paraguay',      stadium: 'Los Ángeles',   result: null },
   { id: 6,  group: 'D', date: '2026-06-13', time: '23:00', home: 'Australia',      away: 'Turquía',       stadium: 'Vancouver',     result: null },
-  { id: 31, group: 'D', date: '2026-06-19', time: '22:00', home: 'Estados Unidos', away: 'Australia',     stadium: 'Seattle',       result: null },
-  { id: 32, group: 'D', date: '2026-06-19', time: '14:00', home: 'Turquía',        away: 'Paraguay',      stadium: 'San Francisco', result: null },
+  { id: 31, group: 'D', date: '2026-06-19', time: '14:00', home: 'Estados Unidos', away: 'Australia',     stadium: 'Seattle',       result: null },
+  { id: 32, group: 'D', date: '2026-06-19', time: '22:00', home: 'Turquía',        away: 'Paraguay',      stadium: 'San Francisco', result: null },
   { id: 59, group: 'D', date: '2026-06-25', time: '21:00', home: 'Turquía',        away: 'Estados Unidos',stadium: 'Los Ángeles',   result: null },
   { id: 60, group: 'D', date: '2026-06-25', time: '21:00', home: 'Paraguay',       away: 'Australia',     stadium: 'San Francisco', result: null },
 
