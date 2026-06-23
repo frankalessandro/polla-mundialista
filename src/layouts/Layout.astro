@@ -92,7 +92,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
 
 		<footer class="flex items-center justify-center gap-2.5 px-4 py-8 text-muted text-sm">
 			<img src={leagueBadge} alt="" class="h-[26px] opacity-70" />
-			<span>Polla Mundialista · Copa del Mundo 2026 · <a href="https://github.com/frankalessandro" target="_blank" rel="noopener noreferrer" class="hover:text-primary transition-colors">@frankalessandro</a></span>
+			<span>Polla Mundialista · Copa del Mundo 2026 · <a href="https://alessandro-web.vercel.app/" target="_blank" rel="noopener noreferrer" class="hover:text-primary transition-colors">@frankalessandro</a></span>
 		</footer>
 
 		<Analytics />
@@ -104,6 +104,10 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
 </html>
 
 <script>
+	document.querySelectorAll<HTMLElement>('.table-scroll').forEach(el => {
+		el.addEventListener('scroll', () => el.classList.add('is-scrolled'), { once: true });
+	});
+
 	const loader = document.getElementById('nav-loader')!;
 
 	document.addEventListener('click', (e) => {

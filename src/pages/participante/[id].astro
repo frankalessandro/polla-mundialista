@@ -66,11 +66,24 @@ const pointClass = (p: number) => (p >= 5 ? 'p-top' : p >= 2 ? 'p-mid' : p > 0 ?
           <tbody>
             {breakdown.map((b) => (
               <tr class={b.match.live ? 'bg-[rgba(255,93,122,.06)]' : ''}>
-                <td>
-                  <a class="flex items-center gap-1.5 text-text font-semibold hover:text-primary transition-colors" href={`/partido/${b.match.id}`}>
+                <td class="min-w-44">
+                  {/* Desktop: horizontal */}
+                  <a class="hidden sm:flex items-center gap-1.5 text-text font-semibold hover:text-primary transition-colors whitespace-nowrap" href={`/partido/${b.match.id}`}>
                     <span class="flex-none"><Flag team={b.match.home} size={14} /></span>
                     <span class="leading-tight">{b.match.home} vs {b.match.away}</span>
                     <span class="flex-none"><Flag team={b.match.away} size={14} /></span>
+                  </a>
+                  {/* Mobile: bandera + nombre + vs centrado */}
+                  <a class="flex sm:hidden items-center gap-2 text-text hover:text-primary transition-colors py-1" href={`/partido/${b.match.id}`}>
+                    <span class="flex flex-col items-center gap-1 min-w-[4.5rem]">
+                      <Flag team={b.match.home} size={22} />
+                      <span class="text-[.75rem] font-semibold leading-tight text-center whitespace-nowrap">{b.match.home}</span>
+                    </span>
+                    <span class="text-[.8rem] font-bold text-muted flex-none">vs</span>
+                    <span class="flex flex-col items-center gap-1 min-w-[4.5rem]">
+                      <Flag team={b.match.away} size={22} />
+                      <span class="text-[.75rem] font-semibold leading-tight text-center whitespace-nowrap">{b.match.away}</span>
+                    </span>
                   </a>
                   {b.match.live && <LiveBadge small />}
                   <span class="block text-muted text-[.78rem] mt-0.5">

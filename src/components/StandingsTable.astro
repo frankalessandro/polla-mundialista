@@ -22,7 +22,7 @@ const rankClass = (i: number) => {
       <thead>
         <tr>
           <th class="num">#</th>
-          <th>Participante</th>
+          <th class="min-w-36 whitespace-nowrap">Participante</th>
           <th class="num" data-col="pts" data-sort="desc" title="Puntos totales">
             Pts
             <svg class="sort-icon" viewBox="0 0 8 12" width="8" height="12" aria-hidden="true">
@@ -73,8 +73,8 @@ const rankClass = (i: number) => {
                   {i + 1}
                 </span>
               </td>
-              <td class="max-w-40">
-                <a href={`/participante/${row.participantId}`} class="text-text font-semibold hover:text-primary transition-colors">
+              <td class="min-w-36">
+                <a href={`/participante/${row.participantId}`} class="text-text font-semibold hover:text-primary transition-colors whitespace-nowrap">
                   {row.name}
                 </a>
               </td>
