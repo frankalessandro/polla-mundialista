@@ -105,7 +105,7 @@ const pointClass = (p: number) => (p >= 5 ? 'p-top' : p >= 2 ? 'p-mid' : p > 0 ?
                   {(() => {
                     const imp = impactByMatch.get(b.match.id);
                     if (!imp) return <span class="font-['Outfit'] text-[.78rem] font-medium text-muted tracking-normal">—</span>;
-                    const rankCls = imp.rank === 1 ? 'rank-1' : imp.rank === 2 ? 'rank-2' : imp.rank === 3 ? 'rank-3' : 'bg-surface-2 text-muted';
+                    const rankCls = imp.rank === 1 ? 'rank-1' : imp.rank === 2 ? 'rank-2' : imp.rank === 3 ? 'rank-3' : imp.rank === 4 ? 'rank-4' : imp.rank === 5 ? 'rank-5' : 'bg-surface-2 text-muted';
                     return (
                       <div class="rank-cell">
                         <span class={`rank-badge ${rankCls}`}>#{imp.rank}</span>
