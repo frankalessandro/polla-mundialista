@@ -152,6 +152,14 @@ th[data-sort="desc"] .sort-icon .down  { opacity: 1; }
 /* ── Responsive ───────────────────────────────────────── */
 @media (max-width: 600px) { .hide-sm { display: none; } }
 @media (max-width: 400px) { .hide-xs { display: none; } }
+
+/* ── Scroll hint (móvil) ──────────────────────────────── */
+.table-scroll { transition: box-shadow .35s ease; }
+@media (max-width: 640px) {
+  .table-scroll:not(.is-scrolled) {
+    box-shadow: inset -28px 0 18px -8px rgba(124, 92, 255, .2);
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.001ms !important;

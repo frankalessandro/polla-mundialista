@@ -104,6 +104,10 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
 </html>
 
 <script>
+	document.querySelectorAll<HTMLElement>('.table-scroll').forEach(el => {
+		el.addEventListener('scroll', () => el.classList.add('is-scrolled'), { once: true });
+	});
+
 	const loader = document.getElementById('nav-loader')!;
 
 	document.addEventListener('click', (e) => {
