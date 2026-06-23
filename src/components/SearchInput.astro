@@ -1,0 +1,28 @@
+---
+interface Props {
+  id: string;
+  placeholder?: string;
+}
+
+const { id, placeholder = 'Buscar participante…' } = Astro.props;
+---
+
+<div class="relative">
+  <svg
+    class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted pointer-events-none transition-colors peer-focus:text-primary"
+    viewBox="0 0 20 20"
+    fill="none"
+    aria-hidden="true"
+  >
+    <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.8"></circle>
+    <path d="M13 13l3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+  </svg>
+  <input
+    id={id}
+    type="search"
+    placeholder={placeholder}
+    autocomplete="off"
+    spellcheck="false"
+    class="peer w-full pl-10 pr-4 py-2.5 border-[1.5px] border-border rounded-xl bg-surface-2 text-text font-medium text-[.9rem] outline-none transition-[border-color,box-shadow,background] placeholder:text-muted placeholder:font-normal focus:bg-surface focus:border-primary focus:[box-shadow:0_0_0_3px_rgba(124,92,255,.14),var(--shadow-sm)] [&::-webkit-search-cancel-button]:hidden"
+  />
+</div>

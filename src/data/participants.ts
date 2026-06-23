@@ -1,14 +1,5 @@
-export type Prediction = {
-  matchId: number;
-  home: number;
-  away: number;
-};
-
-export type Participant = {
-  id: number;
-  name: string;
-  predictions: Prediction[];
-};
+export type { Prediction, Participant } from '../types.ts';
+import type { Participant } from '../types.ts';
 
 // Datos extraídos de src/data/Prueba.xlsx (hoja "Polla - Grupos").
 // 59 participantes · 72 predicciones cada uno (fase de grupos).

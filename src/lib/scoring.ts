@@ -1,5 +1,4 @@
-import type { Match, Score } from '../data/matches';
-import type { Participant, Prediction } from '../data/participants';
+import type { Match, Score, Participant, Prediction } from '../types.ts';
 
 /** Signo de la diferencia de goles: 1 local gana, -1 visitante gana, 0 empate. */
 const sign = (diff: number): -1 | 0 | 1 => (diff > 0 ? 1 : diff < 0 ? -1 : 0);
@@ -131,5 +130,3 @@ export function buildStandings(
       return 0;
     });
 }
-
-export type { Prediction };

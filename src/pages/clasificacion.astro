@@ -4,8 +4,7 @@ import StandingsTable from "../components/StandingsTable.astro";
 import ParticipantSearch from "../components/ParticipantSearch.astro";
 import DesempateToggle from "../components/DesempateToggle.astro";
 import InfoModal from "../components/InfoModal.astro";
-import LiveBadge from "../components/LiveBadge.astro";
-import Flag from "../components/Flag.astro";
+import MatchCard from "../components/MatchCard.astro";
 import { getMatches } from "../lib/matchSource.ts";
 import { getLeagueBadge } from "../lib/sportsdb.ts";
 import { buildStandings } from "../lib/scoring.ts";
@@ -48,36 +47,7 @@ const liveMatches = matches.filter((m) => m.live);
           <span class="text-[.85rem] text-muted font-medium">Clasificación provisional — los puntos pueden cambiar</span>
         </div>
         <div class="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-3.5">
-          {liveMatches.map((m) => (
-            <a
-              href={`/partido/${m.id}`}
-              class="live-card block bg-surface border border-[rgba(255,93,122,.45)] rounded-2xl p-[.9rem_1.05rem] text-text transition-[transform,box-shadow] duration-200 hover:-translate-y-1"
-            >
-              <div class="flex items-center justify-between mb-2.5">
-                <span class="text-[.72rem] font-bold uppercase tracking-[.06em] text-primary">
-                  Grupo {m.group}
-                </span>
-                <LiveBadge small />
-              </div>
-              <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2.5">
-                <span class="flex items-center justify-end gap-2 font-semibold min-w-0 text-right">
-                  <span class="overflow-hidden text-ellipsis whitespace-nowrap min-w-0">{m.home}</span>
-                  <Flag team={m.home} size={22} />
-                </span>
-                <span class="font-['Bebas_Neue'] text-2xl tracking-[.04em] text-live min-w-[3.2rem] text-center">
-                  {m.result!.home} - {m.result!.away}
-                </span>
-                <span class="flex items-center gap-2 font-semibold min-w-0">
-                  <Flag team={m.away} size={22} />
-                  <span class="overflow-hidden text-ellipsis whitespace-nowrap min-w-0">{m.away}</span>
-                </span>
-              </div>
-              <div class="flex justify-between gap-2 mt-3 pt-2.5 border-t border-dashed border-border text-muted text-[.78rem]">
-                <span>{m.date} · {m.time}</span>
-                <span class="text-right overflow-hidden text-ellipsis whitespace-nowrap">{m.stadium}</span>
-              </div>
-            </a>
-          ))}
+          {liveMatches.map((m) => <MatchCard match={m} />)}
         </div>
       </div>
     )

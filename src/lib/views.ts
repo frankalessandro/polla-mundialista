@@ -1,5 +1,4 @@
-import type { Group, Match, Score } from '../data/matches.ts';
-import type { Participant } from '../data/participants.ts';
+import type { Group, Match, Score, Participant } from '../types.ts';
 import { buildStandings, scorePrediction } from './scoring.ts';
 
 /**

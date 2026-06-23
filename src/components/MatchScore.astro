@@ -1,0 +1,45 @@
+---
+import Flag from './Flag.astro';
+
+interface Props {
+  home: string;
+  away: string;
+  result?: { home: number; away: number } | null;
+  live?: boolean;
+  size?: 'md' | 'lg';
+}
+
+const { home, away, result, live = false, size = 'md' } = Astro.props;
+const played = result != null;
+const scoreColor = played ? 'text-primary' : live ? 'text-live' : 'text-muted';
+---
+
+{size === 'lg' ? (
+  <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-3 text-[1.3rem] font-bold">
+    <div class="flex items-center justify-end gap-2.5">
+      <span class="text-right leading-tight line-clamp-2">{home}</span>
+      <span class="flex-none"><Flag team={home} size={34} /></span>
+    </div>
+    <span class={`font-['Bebas_Neue'] text-[2.6rem] tracking-[.04em] leading-none max-[520px]:text-[2rem] ${scoreColor}`}>
+      {played ? `${result!.home} - ${result!.away}` : 'vs'}
+    </span>
+    <div class="flex items-center gap-2.5">
+      <span class="flex-none"><Flag team={away} size={34} /></span>
+      <span class="leading-tight line-clamp-2">{away}</span>
+    </div>
+  </div>
+) : (
+  <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2.5">
+    <span class="flex items-center justify-end gap-2 font-semibold min-w-0 text-right">
+      <span class="overflow-hidden text-ellipsis whitespace-nowrap min-w-0">{home}</span>
+      <Flag team={home} size={22} />
+    </span>
+    <span class={`font-['Bebas_Neue'] text-2xl tracking-[.04em] min-w-[3.2rem] text-center ${scoreColor}`}>
+      {played ? `${result!.home} - ${result!.away}` : 'vs'}
+    </span>
+    <span class="flex items-center gap-2 font-semibold min-w-0">
+      <Flag team={away} size={22} />
+      <span class="overflow-hidden text-ellipsis whitespace-nowrap min-w-0">{away}</span>
+    </span>
+  </div>
+)}
