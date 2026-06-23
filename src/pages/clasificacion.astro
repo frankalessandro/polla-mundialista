@@ -5,6 +5,7 @@ import ParticipantSearch from "../components/ParticipantSearch.astro";
 import DesempateToggle from "../components/DesempateToggle.astro";
 import InfoModal from "../components/InfoModal.astro";
 import LiveBadge from "../components/LiveBadge.astro";
+import Flag from "../components/Flag.astro";
 import { getMatches } from "../lib/matchSource.ts";
 import { getLeagueBadge } from "../lib/sportsdb.ts";
 import { buildStandings } from "../lib/scoring.ts";
@@ -42,22 +43,39 @@ const liveMatches = matches.filter((m) => m.live);
 
   {
     liveMatches.length > 0 && (
-      <div class="reveal bg-surface border border-[rgba(255,93,122,.3)] rounded-2xl p-[.9rem_1.1rem] mb-6 [box-shadow:var(--shadow-sm)]">
-        <div class="flex items-center gap-2.5 flex-wrap text-text">
-          <LiveBadge label="En vivo" />
-          <strong>Clasificación provisional</strong> — los puntos pueden cambiar
+      <div class="reveal mb-6">
+        <div class="flex items-center gap-2.5 mb-3">
+          <span class="text-[.85rem] text-muted font-medium">Clasificación provisional — los puntos pueden cambiar</span>
         </div>
-        <div class="flex flex-wrap gap-2 mt-3">
+        <div class="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-3.5">
           {liveMatches.map((m) => (
             <a
               href={`/partido/${m.id}`}
-              class="bg-surface-2 border border-border rounded-full px-3 py-1 text-[.85rem] text-text transition-[transform,box-shadow] duration-[.18s] hover:-translate-y-0.5 hover:[box-shadow:var(--shadow-sm)]"
+              class="live-card block bg-surface border border-[rgba(255,93,122,.45)] rounded-2xl p-[.9rem_1.05rem] text-text transition-[transform,box-shadow] duration-200 hover:-translate-y-1"
             >
-              {m.home}{" "}
-              <b class="text-live">
-                {m.result!.home}-{m.result!.away}
-              </b>{" "}
-              {m.away}
+              <div class="flex items-center justify-between mb-2.5">
+                <span class="text-[.72rem] font-bold uppercase tracking-[.06em] text-primary">
+                  Grupo {m.group}
+                </span>
+                <LiveBadge small />
+              </div>
+              <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2.5">
+                <span class="flex items-center justify-end gap-2 font-semibold min-w-0 text-right">
+                  <span class="overflow-hidden text-ellipsis whitespace-nowrap min-w-0">{m.home}</span>
+                  <Flag team={m.home} size={22} />
+                </span>
+                <span class="font-['Bebas_Neue'] text-2xl tracking-[.04em] text-live min-w-[3.2rem] text-center">
+                  {m.result!.home} - {m.result!.away}
+                </span>
+                <span class="flex items-center gap-2 font-semibold min-w-0">
+                  <Flag team={m.away} size={22} />
+                  <span class="overflow-hidden text-ellipsis whitespace-nowrap min-w-0">{m.away}</span>
+                </span>
+              </div>
+              <div class="flex justify-between gap-2 mt-3 pt-2.5 border-t border-dashed border-border text-muted text-[.78rem]">
+                <span>{m.date} · {m.time}</span>
+                <span class="text-right overflow-hidden text-ellipsis whitespace-nowrap">{m.stadium}</span>
+              </div>
             </a>
           ))}
         </div>

@@ -159,6 +159,9 @@ th[data-sort="desc"] .sort-icon .down  { opacity: 1; }
   .table-scroll:not(.is-scrolled) {
     box-shadow: inset -28px 0 18px -8px rgba(124, 92, 255, .2);
   }
+  #standings-wrapper[data-mode="simple"] .table-scroll {
+    box-shadow: none;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
