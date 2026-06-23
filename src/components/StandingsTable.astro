@@ -1,19 +1,13 @@
 ---
 import type { StandingRow } from '../lib/scoring.ts';
+import { getRankClass } from '../lib/styles.ts';
+import SortIcon from './SortIcon.astro';
 
 interface Props {
   rows: StandingRow[];
 }
 
 const { rows } = Astro.props;
-const rankClass = (i: number) => {
-  if (i === 0) return 'rank-1';
-  if (i === 1) return 'rank-2';
-  if (i === 2) return 'rank-3';
-  if (i === 3) return 'rank-4';
-  if (i === 4) return 'rank-5';
-  return 'bg-surface-2 text-muted';
-};
 ---
 
 <div id="standings-wrapper" data-mode="simple">
@@ -25,33 +19,23 @@ const rankClass = (i: number) => {
           <th class="min-w-36 whitespace-nowrap">Participante</th>
           <th class="num" data-col="pts" data-sort="desc" title="Puntos totales">
             Pts
-            <svg class="sort-icon" viewBox="0 0 8 12" width="8" height="12" aria-hidden="true">
-              <path class="up" d="M4 0L0 5h8z" /><path class="down" d="M4 12L0 7h8z" />
-            </svg>
+            <SortIcon />
           </th>
           <th class="num" data-col="exactos" title="Marcadores exactos (5 pts) — desempate 1">
             Exactos
-            <svg class="sort-icon" viewBox="0 0 8 12" width="8" height="12" aria-hidden="true">
-              <path class="up" d="M4 0L0 5h8z" /><path class="down" d="M4 12L0 7h8z" />
-            </svg>
+            <SortIcon />
           </th>
           <th class="num col-detail" data-col="tres" title="Ganador correcto + un gol acertado — desempate 2">
             3 pts
-            <svg class="sort-icon" viewBox="0 0 8 12" width="8" height="12" aria-hidden="true">
-              <path class="up" d="M4 0L0 5h8z" /><path class="down" d="M4 12L0 7h8z" />
-            </svg>
+            <SortIcon />
           </th>
           <th class="num col-detail" data-col="dos" title="Ganador o empate simple — desempate 3">
             2 pts
-            <svg class="sort-icon" viewBox="0 0 8 12" width="8" height="12" aria-hidden="true">
-              <path class="up" d="M4 0L0 5h8z" /><path class="down" d="M4 12L0 7h8z" />
-            </svg>
+            <SortIcon />
           </th>
           <th class="num col-detail" data-col="uno" title="Un gol acertado, resultado fallado — desempate 4">
             1 pt
-            <svg class="sort-icon" viewBox="0 0 8 12" width="8" height="12" aria-hidden="true">
-              <path class="up" d="M4 0L0 5h8z" /><path class="down" d="M4 12L0 7h8z" />
-            </svg>
+            <SortIcon />
           </th>
         </tr>
       </thead>
@@ -69,7 +53,7 @@ const rankClass = (i: number) => {
               data-uno={row.onePointHits}
             >
               <td class="num">
-                <span class={`inline-flex items-center justify-center min-w-[1.6rem] h-[1.6rem] px-1.5 rounded-full font-bold text-[.85rem] ${rankClass(i)}`}>
+                <span class={`inline-flex items-center justify-center min-w-[1.6rem] h-[1.6rem] px-1.5 rounded-full font-bold text-[.85rem] ${getRankClass(i + 1)}`}>
                   {i + 1}
                 </span>
               </td>

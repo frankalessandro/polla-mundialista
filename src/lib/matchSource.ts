@@ -1,5 +1,5 @@
 import { matches } from '../data/matches.ts';
-import type { Match } from '../data/matches.ts';
+import type { Match } from '../types.ts';
 import { fetchResults, pairKey } from './sportsdb.ts';
 
 /**
@@ -10,8 +10,18 @@ import { fetchResults, pairKey } from './sportsdb.ts';
  * se superponen sobre cada partido casando por el par de equipos. Si la API
  * falla, devolvemos el fixture con `result: null` para que el sitio siempre
  * compile.
+ *
+ * La promesa se memoiza para que múltiples llamadas dentro del mismo proceso
+ * de build compartan una sola petición a la API.
  */
-export async function getMatches(): Promise<Match[]> {
+let _cached: Promise<Match[]> | null = null;
+
+export function getMatches(): Promise<Match[]> {
+  if (!_cached) _cached = resolveMatches();
+  return _cached;
+}
+
+async function resolveMatches(): Promise<Match[]> {
   let results: Awaited<ReturnType<typeof fetchResults>>;
   try {
     results = await fetchResults();

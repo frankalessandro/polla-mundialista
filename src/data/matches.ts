@@ -1,22 +1,5 @@
-export type Group = 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | 'K' | 'L';
-export type Score = { home: number; away: number };
-
-export type Match = {
-  id: number;
-  group: Group;
-  date: string;
-  time: string;
-  home: string;
-  away: string;
-  stadium: string;
-  result: Score | null;
-  /**
-   * `true` cuando `result` es un marcador EN VIVO (parcial): los puntos
-   * derivados son provisionales y pueden cambiar. Lo fija {@link getMatches}
-   * desde el estado de la API; en los datos estáticos siempre va ausente.
-   */
-  live?: boolean;
-};
+export type { Group, Score, Match } from '../types.ts';
+import type { Match } from '../types.ts';
 
 export const matches: Match[] = [
   // ── Grupo A ──────────────────────────────────────────────────────────────

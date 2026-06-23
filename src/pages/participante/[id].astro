@@ -6,6 +6,7 @@ import { getMatches } from '../../lib/matchSource.ts';
 import { breakdownForParticipant, participantPositionHistory } from '../../lib/views.ts';
 import { buildStandings } from '../../lib/scoring.ts';
 import { participants } from '../../data/participants.ts';
+import { getRankClass, getPointClass } from '../../lib/styles.ts';
 
 export function getStaticPaths() {
   return participants.map((p) => ({ params: { id: String(p.id) } }));
@@ -22,7 +23,6 @@ const row = standings.find((r) => r.participantId === id)!;
 const hasLive = breakdown.some((b) => b.match.live);
 const impactByMatch = participantPositionHistory(id, matches, participants);
 const exact = breakdown.filter((b) => b.points === 5).length;
-const pointClass = (p: number) => (p >= 5 ? 'p-top' : p >= 2 ? 'p-mid' : p > 0 ? 'p-low' : 'p-zero');
 ---
 
 <Layout title={participant.name}>
@@ -99,16 +99,15 @@ const pointClass = (p: number) => (p >= 5 ? 'p-top' : p >= 2 ? 'p-mid' : p > 0 ?
                 <td class="num">
                   {b.points === null
                     ? <span class="font-['Outfit'] text-[.78rem] font-medium text-muted tracking-normal">—</span>
-                    : <span class={`pts ${pointClass(b.points)}`}>{b.points}</span>}
+                    : <span class={`pts ${getPointClass(b.points)}`}>{b.points}</span>}
                 </td>
                 <td class="num">
                   {(() => {
                     const imp = impactByMatch.get(b.match.id);
                     if (!imp) return <span class="font-['Outfit'] text-[.78rem] font-medium text-muted tracking-normal">—</span>;
-                    const rankCls = imp.rank === 1 ? 'rank-1' : imp.rank === 2 ? 'rank-2' : imp.rank === 3 ? 'rank-3' : imp.rank === 4 ? 'rank-4' : imp.rank === 5 ? 'rank-5' : 'bg-surface-2 text-muted';
                     return (
                       <div class="rank-cell">
-                        <span class={`rank-badge ${rankCls}`}>#{imp.rank}</span>
+                        <span class={`rank-badge ${getRankClass(imp.rank)}`}>#{imp.rank}</span>
                         {imp.change > 0 && <span class="delta up">↑{imp.change}</span>}
                         {imp.change < 0 && <span class="delta down">↓{Math.abs(imp.change)}</span>}
                         {imp.change === 0 && <span class="delta neutral">—</span>}
@@ -124,4 +123,3 @@ const pointClass = (p: number) => (p >= 5 ? 'p-top' : p >= 2 ? 'p-mid' : p > 0 ?
     </div>
   )}
 </Layout>
-

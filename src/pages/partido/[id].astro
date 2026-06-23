@@ -1,23 +1,22 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import PredictionsTable from '../../components/PredictionsTable.astro';
-import Flag from '../../components/Flag.astro';
 import LiveBadge from '../../components/LiveBadge.astro';
+import MatchScore from '../../components/MatchScore.astro';
 import { getMatches } from '../../lib/matchSource.ts';
 import { predictionsForMatch, standingsImpactForMatch } from '../../lib/views.ts';
 import { participants } from '../../data/participants.ts';
 
 export async function getStaticPaths() {
   const matches = await getMatches();
-  return matches.map((m) => ({ params: { id: String(m.id) }, props: { match: m } }));
+  return matches.map((m) => ({ params: { id: String(m.id) }, props: { match: m, allMatches: matches } }));
 }
 
-const { match } = Astro.props;
+const { match, allMatches } = Astro.props;
 const played = match.result !== null;
 const live = match.live === true;
-const matches = await getMatches();
 const rows = predictionsForMatch(match, participants);
-const impact = played ? standingsImpactForMatch(match.id, matches, participants) : undefined;
+const impact = played ? standingsImpactForMatch(match.id, allMatches, participants) : undefined;
 ---
 
 <Layout title={`${match.home} vs ${match.away}`}>
@@ -29,19 +28,7 @@ const impact = played ? standingsImpactForMatch(match.id, matches, participants)
       {live && <LiveBadge />}
     </div>
 
-    <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-3 text-[1.3rem] font-bold">
-      <div class="flex items-center justify-end gap-2.5">
-        <span class="text-right leading-tight line-clamp-2">{match.home}</span>
-        <span class="flex-none"><Flag team={match.home} size={34} /></span>
-      </div>
-      <span class={`font-['Bebas_Neue'] text-[2.6rem] tracking-[.04em] leading-none max-[520px]:text-[2rem] ${played ? 'text-primary' : live ? 'text-live' : 'text-muted'}`}>
-        {played ? `${match.result!.home} - ${match.result!.away}` : 'vs'}
-      </span>
-      <div class="flex items-center gap-2.5">
-        <span class="flex-none"><Flag team={match.away} size={34} /></span>
-        <span class="leading-tight line-clamp-2">{match.away}</span>
-      </div>
-    </div>
+    <MatchScore home={match.home} away={match.away} result={match.result} live={live} size="lg" />
 
     <p class="mt-4 mb-0 text-muted text-[.9rem] font-medium">
       {match.date} · {match.time} · {match.stadium}

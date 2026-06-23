@@ -1,6 +1,9 @@
 ---
 import type { MatchPredictionRow, MatchImpact } from "../lib/views.ts";
 import type { Match } from "../data/matches.ts";
+import { getRankClass, getPointClass } from "../lib/styles.ts";
+import SortIcon from "./SortIcon.astro";
+import SearchInput from "./SearchInput.astro";
 
 interface Props {
   rows: MatchPredictionRow[];
@@ -10,40 +13,11 @@ interface Props {
 }
 
 const { rows, played, impact } = Astro.props;
-
-const rankClass = (rank: number) =>
-  rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : rank === 4 ? 'rank-4' : rank === 5 ? 'rank-5' : 'bg-surface-2 text-muted';
-const pointClass = (p: number | null) =>
-  p === null
-    ? ""
-    : p >= 5
-      ? "p-top"
-      : p >= 2
-        ? "p-mid"
-        : p > 0
-          ? "p-low"
-          : "p-zero";
 ---
 
 <div class="bg-surface rounded-lg p-4">
-  <div class="relative mb-4">
-    <svg
-      class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted pointer-events-none transition-colors peer-focus:text-primary"
-      viewBox="0 0 20 20"
-      fill="none"
-      aria-hidden="true"
-    >
-      <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.8"></circle>
-      <path d="M13 13l3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
-    </svg>
-    <input
-      id="pred-search"
-      type="search"
-      placeholder="Buscar participante…"
-      autocomplete="off"
-      spellcheck="false"
-      class="peer w-full pl-10 pr-4 py-2.5 border-[1.5px] border-border rounded-xl bg-surface-2 text-text font-medium text-[.9rem] outline-none transition-[border-color,box-shadow,background] placeholder:text-muted placeholder:font-normal focus:bg-surface focus:border-primary focus:[box-shadow:0_0_0_3px_rgba(124,92,255,.14),var(--shadow-sm)] [&::-webkit-search-cancel-button]:hidden"
-    />
+  <div class="mb-4">
+    <SearchInput id="pred-search" />
   </div>
 
   <div class="table-scroll">
@@ -55,17 +29,13 @@ const pointClass = (p: number | null) =>
           {played && (
             <th class="num" data-col="pts" data-sort="desc">
               Puntos
-              <svg class="sort-icon" viewBox="0 0 8 12" width="8" height="12" aria-hidden="true">
-                <path class="up" d="M4 0L0 5h8z" /><path class="down" d="M4 12L0 7h8z" />
-              </svg>
+              <SortIcon />
             </th>
           )}
           {impact && (
             <th class="num" data-col="rank" data-sort="asc" title="Posición en la clasificación general">
               Pos.
-              <svg class="sort-icon" viewBox="0 0 8 12" width="8" height="12" aria-hidden="true">
-                <path class="up" d="M4 0L0 5h8z" /><path class="down" d="M4 12L0 7h8z" />
-              </svg>
+              <SortIcon />
             </th>
           )}
         </tr>
@@ -89,7 +59,7 @@ const pointClass = (p: number | null) =>
                 </td>
                 {played && (
                   <td class="num">
-                    <span class={`pts ${pointClass(row.points)}`}>
+                    <span class={`pts ${getPointClass(row.points)}`}>
                       {row.points}
                     </span>
                   </td>
@@ -97,7 +67,7 @@ const pointClass = (p: number | null) =>
                 {imp && (
                   <td class="num">
                     <div class="rank-cell">
-                      <span class={`rank-badge ${rankClass(imp.rank)}`}>
+                      <span class={`rank-badge ${getRankClass(imp.rank)}`}>
                         #{imp.rank}
                       </span>
                       {imp.change > 0 && (
@@ -187,4 +157,3 @@ const pointClass = (p: number | null) =>
     sortBy(col, dir);
   });
 </script>
-
