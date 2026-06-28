@@ -1,0 +1,239 @@
+---
+import type { StandingRow } from '../lib/scoring.ts';
+
+interface Props {
+  rows: StandingRow[];
+}
+
+const { rows } = Astro.props;
+const top5 = rows.slice(0, 5);
+
+const rankGradients = [
+  'linear-gradient(160deg, #ffe87a 0%, #f7c94a 45%, #c88f00 100%)',
+  'linear-gradient(160deg, #f5f7fb 0%, #d6dcea 50%, #aab3c8 100%)',
+  'linear-gradient(160deg, #ffd4a0 0%, #d4884a 50%, #a85c20 100%)',
+  'linear-gradient(160deg, #b8d8f8 0%, #6aaae8 50%, #3070be 100%)',
+  'linear-gradient(160deg, #b4e8b4 0%, #5ec05e 50%, #277a27 100%)',
+];
+
+const rankTextColors = ['#5a3d00', '#353a50', '#5a2e08', '#1a3f6e', '#134a13'];
+
+const rankGlow = [
+  'rgba(247,185,85,.45)',
+  'rgba(170,179,200,.4)',
+  'rgba(212,136,74,.4)',
+  'rgba(106,170,232,.4)',
+  'rgba(94,192,94,.4)',
+];
+
+const barHeights = [210, 168, 140, 112, 88];
+
+
+---
+
+<section class="podio-section reveal">
+  <div class="podio-header">
+    <span class="podio-eyebrow">Polla Mundialista · Copa del Mundo 2026</span>
+    <h2 class="podio-title">Podio Final</h2>
+    <p class="podio-sub">Los 5 mejores de la fase de grupos</p>
+  </div>
+
+  <div class="podio-stage">
+    {top5.map((row, i) => {
+      const barH = barHeights[i];
+      const grad = rankGradients[i];
+      const textColor = rankTextColors[i];
+      const glow = rankGlow[i];
+      return (
+        <a href={`/participante/${row.participantId}`} class="podio-item" style={`--bar-h:${barH}px;--grad:${grad};--text:${textColor};--glow:${glow}`} aria-label={`${i + 1}º ${row.name} — ${row.total} puntos`}>
+          <div class="podio-badge">{i + 1}</div>
+          <div class="podio-info">
+            <span class="podio-name">{row.name}</span>
+            <span class="podio-pts">{row.total} <span class="podio-pts-label">pts</span></span>
+          </div>
+          <div class="podio-bar">
+            <div class="podio-shine" />
+          </div>
+        </a>
+      );
+    })}
+  </div>
+</section>
+
+<style>
+  .podio-section {
+    margin-bottom: 2.5rem;
+    animation-delay: .04s;
+  }
+
+  .podio-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .podio-eyebrow {
+    display: block;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    margin-bottom: .35rem;
+  }
+
+  .podio-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.6rem, 6vw, 3.8rem);
+    letter-spacing: .04em;
+    line-height: 1;
+    margin: 0 0 .3rem;
+    background: var(--grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .podio-sub {
+    font-size: .9rem;
+    color: var(--color-muted);
+    margin: 0;
+    font-weight: 500;
+  }
+
+  /* Stage: flex row, bars grow from bottom */
+  .podio-stage {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: .9rem;
+    padding: 1.5rem 1rem 0;
+  }
+
+  /* Each column */
+  .podio-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    max-width: 160px;
+    min-width: 0;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform .22s cubic-bezier(.22,1,.36,1);
+  }
+
+  .podio-item:hover { transform: translateY(-6px); }
+
+  /* Rank badge */
+  .podio-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: .04em;
+    background: var(--grad);
+    color: var(--text);
+    box-shadow: 0 4px 12px var(--glow);
+    margin-bottom: .55rem;
+    flex-shrink: 0;
+  }
+
+  /* Name + points block above the bar */
+  .podio-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .18rem;
+    margin-bottom: .7rem;
+    width: 100%;
+  }
+
+  .podio-name {
+    font-weight: 700;
+    font-size: .82rem;
+    color: var(--color-text);
+    text-align: center;
+    line-height: 1.2;
+    word-break: break-word;
+    hyphens: auto;
+  }
+
+  .podio-pts {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.45rem;
+    letter-spacing: .05em;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .podio-pts-label {
+    font-family: 'Outfit', sans-serif;
+    font-size: .65rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    vertical-align: middle;
+    margin-left: .1rem;
+  }
+
+  /* The bar itself */
+  .podio-bar {
+    width: 100%;
+    height: var(--bar-h);
+    background: var(--grad);
+    border-radius: 10px 10px 4px 4px;
+    box-shadow: 0 8px 24px var(--glow), inset 0 1px 0 rgba(255,255,255,.45);
+    position: relative;
+    overflow: hidden;
+    transition: box-shadow .22s ease;
+  }
+
+  .podio-item:hover .podio-bar {
+    box-shadow: 0 14px 36px var(--glow), inset 0 1px 0 rgba(255,255,255,.55);
+  }
+
+  /* Inner shine stripe */
+  .podio-shine {
+    position: absolute;
+    top: 0;
+    left: 12%;
+    width: 28%;
+    height: 100%;
+    background: linear-gradient(180deg, rgba(255,255,255,.35) 0%, transparent 60%);
+    border-radius: 0 0 6px 6px;
+    pointer-events: none;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .podio-stage {
+      gap: .5rem;
+      padding-inline: .25rem;
+    }
+
+    .podio-name {
+      font-size: .72rem;
+    }
+
+    .podio-pts {
+      font-size: 1.2rem;
+    }
+
+    .podio-pct {
+      display: none;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .podio-badge {
+      width: 1.6rem;
+      height: 1.6rem;
+      font-size: .9rem;
+    }
+  }
+</style>
