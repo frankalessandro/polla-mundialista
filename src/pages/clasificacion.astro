@@ -1,6 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import StandingsTable from "../components/StandingsTable.astro";
+import Podio from "../components/Podio.astro";
 import ParticipantSearch from "../components/ParticipantSearch.astro";
 import DesempateToggle from "../components/DesempateToggle.astro";
 import InfoModal from "../components/InfoModal.astro";
@@ -61,6 +62,8 @@ const liveMatches = matches.filter((m) => m.live);
       </p>
     )
   }
+
+  <Podio rows={standings} />
 
   <div class="mb-4">
     <ParticipantSearch />
